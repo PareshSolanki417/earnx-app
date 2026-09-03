@@ -5,6 +5,23 @@
 const TasksManager = {
   tasks: [],
 
+  async openOfferwall() {
+    try {
+      App.showToast('Loading Mega Offerwall missions...', 'info');
+      const res = await API.get('/paymentwall/widget-url');
+      if (res && res.url) {
+        if (window.Telegram?.WebApp?.openLink) {
+          window.Telegram.WebApp.openLink(res.url);
+        } else {
+          window.open(res.url, '_blank');
+        }
+      }
+    } catch (e) {
+      console.warn('Could not open offerwall:', e);
+      App.showToast('Could not load offerwall. Please try again.', 'error');
+    }
+  },
+
   async fetchTasks() {
     const container = document.getElementById('tasks-list-container');
     try {
