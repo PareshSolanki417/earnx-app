@@ -48,11 +48,11 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         [
             InlineKeyboardButton(
                 text="📢 Official Announcements",
-                url="https://t.me/EarnXOfficial",
+                url="https://t.me/EarnX_App",
             ),
             InlineKeyboardButton(
                 text="💬 Support",
-                url="https://t.me/EarnXSupportBot",
+                url="https://t.me/SolankiPareshm",
             ),
         ],
     ]

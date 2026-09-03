@@ -88,11 +88,11 @@ async def telegram_webhook(request: Request, background_tasks: BackgroundTasks) 
                 [
                     {
                         "text": "📢 Channel",
-                        "url": "https://t.me/EarnXOfficial"
+                        "url": "https://t.me/EarnX_App"
                     },
                     {
                         "text": "💬 Support",
-                        "url": "https://t.me/EarnXSupportBot"
+                        "url": "https://t.me/SolankiPareshm"
                     }
                 ]
             ]
@@ -106,7 +106,7 @@ async def telegram_webhook(request: Request, background_tasks: BackgroundTasks) 
             "1. Tap <b>Open EarnX App</b> to launch the Mini App.\n"
             "2. All coin balances are stored in an immutable double-entry ledger.\n"
             "3. Payouts require a minimum of ₹50.00 (5,000 coins).\n"
-            "4. Need help? Contact @EarnXSupportBot"
+            "4. Need help? Contact @SolankiPareshm"
         )
         background_tasks.add_task(send_telegram_reply, chat_id, help_text)
 

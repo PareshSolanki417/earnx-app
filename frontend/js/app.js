@@ -249,7 +249,8 @@ const App = {
         content: `
           <h4>Need Assistance?</h4>
           <p>For payout inquiries, task verification, or account reviews, please reach out via our official support channels:</p>
-          <p><strong>Telegram:</strong> @EarnXSupportBot</p>
+          <p><strong>Telegram:</strong> <a href="https://t.me/SolankiPareshm" target="_blank" style="color:var(--primary)">@SolankiPareshm</a></p>
+          <p><strong>Channel:</strong> <a href="https://t.me/EarnX_App" target="_blank" style="color:var(--primary)">@EarnX_App</a></p>
           <p><strong>Email:</strong> support@earnx.app</p>
         `
       }

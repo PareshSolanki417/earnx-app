@@ -58,9 +58,9 @@ def seed_database(db: Session):
                 description="Join our Telegram announcement channel to stay updated with high-paying reward drops and payout proofs.",
                 icon="telegram",
                 reward_coins=Decimal("25.0"),
-                action_url="https://t.me/EarnXOfficial",
-                verification_method="TELEGRAM_CHANNEL",
-                verification_data="@EarnXOfficial",
+                action_url="https://t.me/EarnX_App",
+                verification_method="TELEGRAM_JOIN",
+                verification_data="@EarnX_App",
                 status="ACTIVE",
             ),
             Task(
