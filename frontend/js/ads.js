@@ -11,6 +11,13 @@ const AdsManager = {
   async checkStatus() {
     try {
       const data = await API.get('/ads/status');
+      if (data.reward_coins) {
+        const rc = parseFloat(data.reward_coins);
+        const el = document.getElementById('watch-reward-val');
+        if (el) {
+          el.innerText = `+${rc.toFixed(0)} Coins (₹${(rc / 100).toFixed(2)})`;
+        }
+      }
       if (!data.can_watch && data.cooldown_seconds > 0) {
         this.startCooldown(data.cooldown_seconds);
       }

@@ -32,7 +32,7 @@ def seed_database(db: Session):
     default_settings = [
         ("COINS_PER_RUPEE", str(settings.COINS_PER_RUPEE), "Number of coins equal to ₹1.00"),
         ("MIN_WITHDRAWAL_RUPEES", str(settings.MIN_WITHDRAWAL_RUPEES), "Minimum withdrawal threshold in INR"),
-        ("AD_REWARD_COINS", "15.0", "Coins awarded per verified rewarded ad impression"),
+        ("AD_REWARD_COINS", "10.0", "Coins awarded per verified rewarded ad impression (10 coins = ₹0.10)"),
         ("REFERRAL_BONUS_COINS", str(settings.REFERRAL_BONUS_COINS), "Coins awarded when a referral completes qualifying actions"),
         ("REFERRAL_QUALIFYING_ACTIONS", str(settings.REFERRAL_QUALIFYING_ACTIONS), "Number of verified ad views required for referral bonus"),
         ("DAILY_BONUS_DAY_1", "10.0", "Coins for Day 1 check-in"),
@@ -49,6 +49,8 @@ def seed_database(db: Session):
         existing = db.query(AppSetting).filter(AppSetting.key == key).first()
         if not existing:
             db.add(AppSetting(key=key, value=val, description=desc))
+        elif key == "AD_REWARD_COINS" and existing.value == "15.0":
+            existing.value = "10.0"
 
     # 3. Seed Default Verified Tasks
     if db.query(Task).count() == 0:

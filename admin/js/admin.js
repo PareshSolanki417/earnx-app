@@ -324,30 +324,145 @@ const AdminApp = {
     const container = document.getElementById('settings-container');
     try {
       const settings = await AdminAPI.get('/admin/settings');
-      container.innerHTML = settings.map(s => `
-        <div class="settings-item" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <strong>${s.key}</strong>
-            <p style="font-size: 12px; color: var(--text-sub);">${s.description || ''}</p>
+      const map = {};
+      settings.forEach(s => { map[s.key] = s.value; });
+
+      const cpr = parseFloat(map['COINS_PER_RUPEE'] || 100);
+
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <!-- Group 1: Ad Earnings -->
+          <div class="settings-group-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+            <h4 style="color: var(--gold); margin-bottom: 16px; font-size: 16px;">
+              <i class="fa-solid fa-clapperboard"></i> 1. Watch & Earn (Ad Reward Settings)
+            </h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+              <div class="setting-field">
+                <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">
+                  Coins per Ad View:
+                </label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="number" step="0.5" id="setting-AD_REWARD_COINS" value="${map['AD_REWARD_COINS'] || '10.0'}" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: #fff;" oninput="AdminApp.calcAdRupees()" />
+                  <button class="btn btn-primary btn-small" onclick="AdminApp.saveSetting('AD_REWARD_COINS')">Save</button>
+                </div>
+                <small id="ad-reward-calc" style="color: var(--emerald); font-size: 12px; display: block; margin-top: 4px;">
+                  = ₹${((parseFloat(map['AD_REWARD_COINS'] || 10) / cpr)).toFixed(2)} per ad view
+                </small>
+              </div>
+
+              <div class="setting-field">
+                <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">
+                  Estimated Ad Revenue (₹ per view):
+                </label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="number" step="0.01" id="setting-ESTIMATED_REVENUE_PER_AD_RUPEES" value="${map['ESTIMATED_REVENUE_PER_AD_RUPEES'] || '0.35'}" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: #fff;" />
+                  <button class="btn btn-primary btn-small" onclick="AdminApp.saveSetting('ESTIMATED_REVENUE_PER_AD_RUPEES')">Save</button>
+                </div>
+                <small style="color: var(--text-sub); font-size: 12px; display: block; margin-top: 4px;">Used for calculating platform profit margin</small>
+              </div>
+            </div>
           </div>
-          <div style="display: flex; gap: 8px;">
-            <input type="text" id="setting-${s.key}" value="${s.value}" style="width: 140px; padding: 6px;" />
-            <button class="btn btn-primary btn-small" onclick="AdminApp.saveSetting('${s.key}')">Save</button>
+
+          <!-- Group 2: Currency & Payouts -->
+          <div class="settings-group-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+            <h4 style="color: var(--emerald); margin-bottom: 16px; font-size: 16px;">
+              <i class="fa-solid fa-coins"></i> 2. Currency Conversion & Payout Thresholds
+            </h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+              <div class="setting-field">
+                <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">
+                  Coins per ₹1.00 (Conversion Rate):
+                </label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="number" id="setting-COINS_PER_RUPEE" value="${map['COINS_PER_RUPEE'] || '100.0'}" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: #fff;" oninput="AdminApp.calcAdRupees()" />
+                  <button class="btn btn-primary btn-small" onclick="AdminApp.saveSetting('COINS_PER_RUPEE')">Save</button>
+                </div>
+                <small style="color: var(--text-sub); font-size: 12px; display: block; margin-top: 4px;">Default: 100 coins = ₹1.00</small>
+              </div>
+
+              <div class="setting-field">
+                <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">
+                  Minimum Withdrawal Amount (₹):
+                </label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="number" id="setting-MIN_WITHDRAWAL_RUPEES" value="${map['MIN_WITHDRAWAL_RUPEES'] || '50.0'}" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: #fff;" />
+                  <button class="btn btn-primary btn-small" onclick="AdminApp.saveSetting('MIN_WITHDRAWAL_RUPEES')">Save</button>
+                </div>
+                <small style="color: var(--text-sub); font-size: 12px; display: block; margin-top: 4px;">Minimum threshold for UPI and Bank transfer</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Group 3: Referral Engine -->
+          <div class="settings-group-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+            <h4 style="color: var(--blue, #3b82f6); margin-bottom: 16px; font-size: 16px;">
+              <i class="fa-solid fa-users"></i> 3. Referral Program Settings
+            </h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+              <div class="setting-field">
+                <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">
+                  Referral Bonus (Coins per successful invite):
+                </label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="number" id="setting-REFERRAL_BONUS_COINS" value="${map['REFERRAL_BONUS_COINS'] || '50.0'}" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: #fff;" />
+                  <button class="btn btn-primary btn-small" onclick="AdminApp.saveSetting('REFERRAL_BONUS_COINS')">Save</button>
+                </div>
+              </div>
+
+              <div class="setting-field">
+                <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">
+                  Qualifying Ads Required:
+                </label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="number" id="setting-REFERRAL_QUALIFYING_ACTIONS" value="${map['REFERRAL_QUALIFYING_ACTIONS'] || '3'}" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: #fff;" />
+                  <button class="btn btn-primary btn-small" onclick="AdminApp.saveSetting('REFERRAL_QUALIFYING_ACTIONS')">Save</button>
+                </div>
+                <small style="color: var(--text-sub); font-size: 12px; display: block; margin-top: 4px;">Ads invited user must watch before bonus unlocks</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Group 4: Daily Bonus 7-Day Streak -->
+          <div class="settings-group-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+            <h4 style="color: #a855f7; margin-bottom: 16px; font-size: 16px;">
+              <i class="fa-solid fa-gift"></i> 4. 7-Day Streak Daily Bonus Coins
+            </h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px;">
+              ${[1,2,3,4,5,6,7].map(day => `
+                <div class="setting-field" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; text-align: center;">
+                  <span style="font-size: 12px; font-weight: 700; color: var(--text-sub);">Day ${day}</span>
+                  <input type="number" id="setting-DAILY_BONUS_DAY_${day}" value="${map[`DAILY_BONUS_DAY_${day}`] || (day * 10)}" style="width: 100%; margin: 6px 0; padding: 6px; text-align: center; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-surface); color: #fff;" />
+                  <button class="btn btn-primary btn-small" style="width: 100%; font-size: 11px; padding: 4px;" onclick="AdminApp.saveSetting('DAILY_BONUS_DAY_${day}')">Save</button>
+                </div>
+              `).join('')}
+            </div>
           </div>
         </div>
-      `).join('');
+      `;
     } catch (e) {
-      container.innerHTML = 'Error loading settings.';
+      container.innerHTML = '<p style="color: var(--red);">Error loading settings. Please try refreshing.</p>';
+    }
+  },
+
+  calcAdRupees() {
+    const coins = parseFloat(document.getElementById('setting-AD_REWARD_COINS')?.value || 10);
+    const cpr = parseFloat(document.getElementById('setting-COINS_PER_RUPEE')?.value || 100);
+    const el = document.getElementById('ad-reward-calc');
+    if (el && cpr > 0) {
+      el.innerText = `= ₹${(coins / cpr).toFixed(2)} per ad view`;
     }
   },
 
   async saveSetting(key) {
-    const val = document.getElementById(`setting-${key}`).value;
+    const input = document.getElementById(`setting-${key}`);
+    if (!input) return;
+    const val = input.value;
     try {
       await AdminAPI.put(`/admin/settings/${key}`, { value: val });
-      alert(`Setting ${key} updated to ${val}`);
+      alert(`✅ Setting '${key}' saved successfully! New value: ${val}`);
+      this.fetchSettings();
     } catch (err) {
-      alert(err.message);
+      alert(`Error saving setting: ${err.message}`);
     }
   },
 

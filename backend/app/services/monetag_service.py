@@ -32,7 +32,7 @@ class MonetagService:
                 return Decimal(setting.value)
         except Exception:
             pass
-        return Decimal("15.0000")
+        return Decimal("10.0000")
 
     @classmethod
     def verify_postback_signature(
