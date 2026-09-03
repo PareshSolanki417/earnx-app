@@ -39,10 +39,15 @@ const App = {
     const urlParams = new URLSearchParams(window.location.search);
     const refCode = urlParams.get('startapp') || urlParams.get('start') || null;
 
-    // Fallback for standalone browser testing in development
+    // Fallback for standalone web browser and mobile visitors outside Telegram
     if (!initData) {
-      console.info('No Telegram initData detected. Using development mock credentials.');
-      initData = 'mock_init_data_user_123456789';
+      let webUserId = localStorage.getItem('earnx_web_user_id');
+      if (!webUserId) {
+        webUserId = String(Math.floor(10000000 + Math.random() * 89999999));
+        localStorage.setItem('earnx_web_user_id', webUserId);
+      }
+      console.info('Running in Web Browser mode with persistent user ID:', webUserId);
+      initData = `web_user_${webUserId}`;
     }
 
     try {

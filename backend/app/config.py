@@ -58,16 +58,16 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
 
-    WEBAPP_URL: str = "http://localhost:8000"
-    FRONTEND_URL: str = "http://localhost:8000"
-    ALLOWED_ORIGINS: str = "http://localhost:8000,http://127.0.0.1:8000,https://web.telegram.org"
+    WEBAPP_URL: str = "https://earnx-app.onrender.com"
+    FRONTEND_URL: str = "https://earnx-app.onrender.com"
+    ALLOWED_ORIGINS: str = "https://earnx-app.onrender.com,http://localhost:8000,http://127.0.0.1:8000,https://web.telegram.org"
 
     DATABASE_URL: Optional[str] = None
 
-    BOT_TOKEN: str = "mock_bot_token"
-    BOT_USERNAME: str = "EarnXBot"
+    BOT_TOKEN: str = "8941202680:AAEe1DbfYdRpdUGkjpI1nEI4di0kFqQ3q7E"
+    BOT_USERNAME: str = "EarnX_App_bot"
 
-    MONETAG_ZONE_ID: str = "mock_zone_id"
+    MONETAG_ZONE_ID: str = "11715052"
     MONETAG_API_KEY: str = "mock_api_key"
     MONETAG_POSTBACK_SECRET: str = "mock_secret_key"
 

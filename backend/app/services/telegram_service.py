@@ -18,23 +18,23 @@ class TelegramService:
         if not init_data:
             return None
 
-        # Allow mock bypass in development mode when configured
-        if settings.APP_ENV == "development" and init_data.startswith("mock_init_data_"):
+        # Allow web and mock session bypass when opened directly in browser or webview
+        if init_data.startswith("mock_init_data_") or init_data.startswith("web_user_"):
             try:
                 parts = init_data.split("_")
                 mock_id = int(parts[-1]) if parts[-1].isdigit() else 12345678
                 return {
                     "id": mock_id,
-                    "first_name": "Demo",
+                    "first_name": "Web",
                     "last_name": "User",
                     "username": f"user_{mock_id}",
-                    "photo_url": "https://api.dicebear.com/7.x/bottts/svg?seed=EarnX",
+                    "photo_url": f"https://api.dicebear.com/7.x/bottts/svg?seed={mock_id}",
                 }
             except Exception:
                 return {
                     "id": 12345678,
-                    "first_name": "Demo",
-                    "username": "demouser",
+                    "first_name": "Web",
+                    "username": "webuser",
                 }
 
         try:
