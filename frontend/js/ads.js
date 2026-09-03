@@ -58,6 +58,11 @@ const AdsManager = {
     }, 1000);
   },
 
+  // Adsgram Ad Block IDs
+  ADSGRAM_REWARD_BLOCK_ID: "45936",
+  ADSGRAM_INT_BLOCK_ID: "int-45940",
+  ADSGRAM_TASK_BLOCK_ID: "task-45941",
+
   async startAdSession() {
     if (this.isWatching || this.remainingSeconds > 0) return;
 
@@ -68,22 +73,36 @@ const AdsManager = {
     btn.disabled = true;
     btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> LOADING OFFER...';
 
-    // Wait up to 2.5 seconds if Monetag SDK is still loading
-    if (typeof window.show_11715052 !== 'function') {
-      for (let i = 0; i < 5; i++) {
-        await new Promise(r => setTimeout(r, 500));
-        if (typeof window.show_11715052 === 'function') break;
-      }
-    }
-
     try {
       const initData = await API.post('/ads/start', { ad_type: 'rewarded' });
       
-      // 1. If Monetag live rewarded SDK function is loaded
+      // 1. PRIMARY: Try Adsgram Native Telegram Rewarded Video (Block ID: 45936)
+      if (window.Adsgram && this.ADSGRAM_REWARD_BLOCK_ID) {
+        btnText.innerHTML = '<i class="fa-solid fa-play"></i> PLAYING SPONSOR AD...';
+        try {
+          const adController = window.Adsgram.init({ blockId: this.ADSGRAM_REWARD_BLOCK_ID });
+          const result = await adController.show();
+          if (result && (result.done || result.state === 'load')) {
+            btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> VERIFYING REWARD...';
+            // Verify and credit via Adsgram endpoint
+            const targetId = App.user.telegram_id || App.user.id;
+            const verifyRes = await API.get(`/adsgram/reward?userid=${targetId}`);
+            App.showToast(`🎉 Reward Received! +${verifyRes.coins_credited || 10} Coins`, 'success');
+            await WalletManager.fetchWallet();
+            App.fetchUserData();
+            this.startCooldown(initData.cooldown_seconds);
+            this.isWatching = false;
+            return;
+          }
+        } catch (adsgramErr) {
+          console.warn('Adsgram not available or error, falling back to Monetag:', adsgramErr);
+        }
+      }
+
+      // 2. SECONDARY: Fallback to Monetag Rewarded Ad (Zone 11715052)
       if (typeof window.show_11715052 === 'function') {
         btnText.innerHTML = '<i class="fa-solid fa-play"></i> PLAYING SPONSOR AD...';
         
-        // Try standard rewarded interstitial, or fallback to rewarded popup format
         const adPromise = window.show_11715052()
           .catch(() => window.show_11715052('pop'));
 
@@ -114,10 +133,12 @@ const AdsManager = {
           this.resetBtn();
           this.isWatching = false;
         });
-      } else if (initData.is_mock) {
-        // 2. Mock simulation for development
-        btnText.innerHTML = '<i class="fa-solid fa-video fa-fade"></i> WATCHING VIDEO (3s)...';
+        return;
+      }
 
+      // 3. Fallback for Local Development Simulation
+      if (initData.is_mock) {
+        btnText.innerHTML = '<i class="fa-solid fa-video fa-fade"></i> WATCHING VIDEO (3s)...';
         setTimeout(async () => {
           try {
             const verifyRes = await API.post('/monetag/postback', {
@@ -127,7 +148,6 @@ const AdsManager = {
               payout: 0.005,
               token: "mock_signature_valid"
             });
-
             App.showToast(`🎉 Reward Received! +${verifyRes.coins_credited} Coins`, 'success');
             await WalletManager.fetchWallet();
             App.fetchUserData();
@@ -139,17 +159,46 @@ const AdsManager = {
             this.isWatching = false;
           }
         }, 3000);
-      } else {
-        // 3. Fallback when Monetag tag script is waiting to load
-        btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> LOADING AD TAG...';
-        App.showToast('Connecting to Monetag ad network, please try again.', 'info');
-        this.resetBtn();
-        this.isWatching = false;
+        return;
       }
+
+      // Fallback
+      btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> LOADING AD...';
+      App.showToast('Connecting to sponsor ad networks, please try again.', 'info');
+      this.resetBtn();
+      this.isWatching = false;
     } catch (err) {
       App.showToast(err.message, 'error');
       this.resetBtn();
       this.isWatching = false;
+    }
+  },
+
+  showInterstitial() {
+    if (window.Adsgram && this.ADSGRAM_INT_BLOCK_ID) {
+      try {
+        const intController = window.Adsgram.init({ blockId: this.ADSGRAM_INT_BLOCK_ID });
+        intController.show().catch(e => console.log('Adsgram interstitial skipped:', e));
+      } catch (e) {}
+    }
+  },
+
+  async playAdsgramTask() {
+    if (!window.Adsgram || !this.ADSGRAM_TASK_BLOCK_ID) {
+      App.showToast('Task ad service not available', 'info');
+      return;
+    }
+    try {
+      const taskController = window.Adsgram.init({ blockId: this.ADSGRAM_TASK_BLOCK_ID });
+      const res = await taskController.show();
+      if (res && res.done) {
+        const targetId = App.user.telegram_id || App.user.id;
+        await API.get(`/adsgram/reward?userid=${targetId}`);
+        App.showToast('🎉 Task Completed! +15 Bonus Coins credited', 'success');
+        await WalletManager.fetchWallet();
+      }
+    } catch (err) {
+      console.warn('Adsgram task error:', err);
     }
   },
 
