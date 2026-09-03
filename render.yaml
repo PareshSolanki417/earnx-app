@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: earnx-api
+    runtime: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --app-dir backend
+    plan: free
+    region: oregon
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_NAME
+        value: EarnX
+      - key: APP_DEBUG
+        value: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: earnx-postgres
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: BOT_TOKEN
+        sync: false
+      - key: BOT_USERNAME
+        sync: false
+      - key: WEBAPP_URL
+        sync: false
+      - key: MONETAG_ZONE_ID
+        sync: false
+      - key: MONETAG_API_KEY
+        sync: false
+      - key: MONETAG_POSTBACK_SECRET
+        sync: false
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_EMAIL
+        value: admin@earnx.app
+      - key: ADMIN_PASSWORD
+        generateValue: true
+
+databases:
+  - name: earnx-postgres
+    plan: free
+    region: oregon
+    databaseName: earnx
+    user: earnx_user

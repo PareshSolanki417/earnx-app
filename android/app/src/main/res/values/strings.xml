@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">EarnX</string>
+    <!-- Set your production Render or custom domain here -->
+    <string name="webapp_url">https://earnx.onrender.com/</string>
+</resources>

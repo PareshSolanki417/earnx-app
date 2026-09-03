@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EarnX Admin Console</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/admin-portal/css/admin.css" />
+</head>
+<body>
+
+  <!-- ================= LOGIN SCREEN ================= -->
+  <div id="admin-login-screen" class="login-wrapper">
+    <div class="login-box">
+      <div class="login-logo">
+        <i class="fa-solid fa-coins gold-coin"></i> Earn<span>X</span> Admin
+      </div>
+      <p class="login-subtitle">Secure administrative operations console</p>
+
+      <form id="admin-login-form" onsubmit="AdminApp.handleLogin(event)">
+        <div class="form-group">
+          <label>Admin Username</label>
+          <input type="text" id="login-username" value="admin" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" value="AdminEarnX2026!" required />
+        </div>
+        <button type="submit" id="btn-login" class="btn btn-primary">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MAIN ADMIN DASHBOARD ================= -->
+  <div id="admin-main-app" class="admin-layout" style="display: none;">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <i class="fa-solid fa-coins gold-coin"></i> Earn<span>X</span>
+      </div>
+
+      <nav class="side-nav">
+        <button class="nav-btn active" data-tab="dashboard" onclick="AdminApp.switchTab('dashboard')">
+          <i class="fa-solid fa-chart-pie"></i> Dashboard
+        </button>
+        <button class="nav-btn" data-tab="users" onclick="AdminApp.switchTab('users')">
+          <i class="fa-solid fa-users"></i> Users
+        </button>
+        <button class="nav-btn" data-tab="withdrawals" onclick="AdminApp.switchTab('withdrawals')">
+          <i class="fa-solid fa-money-bill-transfer"></i> Withdrawals
+        </button>
+        <button class="nav-btn" data-tab="tasks" onclick="AdminApp.switchTab('tasks')">
+          <i class="fa-solid fa-list-check"></i> Tasks
+        </button>
+        <button class="nav-btn" data-tab="fraud" onclick="AdminApp.switchTab('fraud')">
+          <i class="fa-solid fa-shield-halved"></i> Fraud & Risk
+        </button>
+        <button class="nav-btn" data-tab="settings" onclick="AdminApp.switchTab('settings')">
+          <i class="fa-solid fa-sliders"></i> Economics
+        </button>
+        <button class="nav-btn" data-tab="logs" onclick="AdminApp.switchTab('logs')">
+          <i class="fa-solid fa-clock-rotate-left"></i> Audit Logs
+        </button>
+      </nav>
+
+      <div class="sidebar-foot">
+        <button class="btn-logout" onclick="AdminApp.logout()">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="admin-main">
+      <header class="topbar">
+        <div class="topbar-title">
+          <h2 id="current-tab-title">Dashboard Overview</h2>
+        </div>
+        <div class="topbar-user">
+          <span class="badge-env" id="env-badge">DEMO MODE</span>
+          <span class="admin-tag"><i class="fa-solid fa-user-shield"></i> Admin</span>
+        </div>
+      </header>
+
+      <div class="content-body">
+
+        <!-- ================= TAB: DASHBOARD ================= -->
+        <section id="tab-dashboard" class="tab-pane active">
+          <!-- Metric KPI Cards -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <span class="kpi-lbl">Total Users</span>
+              <span class="kpi-val" id="kpi-total-users">0</span>
+              <span class="kpi-sub" id="kpi-today-users">+0 today</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-lbl">Total Coins Issued</span>
+              <span class="kpi-val text-gold" id="kpi-total-coins">0</span>
+              <span class="kpi-sub">Across all activities</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-lbl">Pending Withdrawals</span>
+              <span class="kpi-val text-orange" id="kpi-pending-withdrawals">0</span>
+              <span class="kpi-sub" id="kpi-pending-amount">₹0.00</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-lbl">Paid Withdrawals</span>
+              <span class="kpi-val text-green" id="kpi-paid-withdrawals">0</span>
+              <span class="kpi-sub" id="kpi-paid-amount">₹0.00</span>
+            </div>
+          </div>
+
+          <!-- Economics & Margin Analysis -->
+          <div class="section-card">
+            <h3><i class="fa-solid fa-chart-line"></i> Revenue & Economics Control</h3>
+            <p class="section-sub">Gross revenue estimate vs user reward liabilities and platform margin.</p>
+
+            <div class="economics-grid">
+              <div class="eco-box">
+                <span class="eco-lbl">Verified Ad Impressions</span>
+                <span class="eco-val" id="kpi-ad-impressions">0</span>
+              </div>
+              <div class="eco-box">
+                <span class="eco-lbl">Est. Gross Revenue</span>
+                <span class="eco-val text-green" id="kpi-gross-revenue">₹0.00</span>
+              </div>
+              <div class="eco-box">
+                <span class="eco-lbl">Est. User Rewards</span>
+                <span class="eco-val text-orange" id="kpi-user-rewards">₹0.00</span>
+              </div>
+              <div class="eco-box">
+                <span class="eco-lbl">Platform Gross Margin</span>
+                <span class="eco-val text-green" id="kpi-margin">₹0.00</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB: USERS ================= -->
+        <section id="tab-users" class="tab-pane">
+          <div class="table-header-actions">
+            <input type="text" id="user-search-input" placeholder="Search by username, name, or code..." oninput="AdminApp.searchUsers()" />
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Referral Code</th>
+                  <th>Coins Balance</th>
+                  <th>Status</th>
+                  <th>Risk Level</th>
+                  <th>Joined</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <tr><td colspan="8" class="text-center">Loading users...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ================= TAB: WITHDRAWALS ================= -->
+        <section id="tab-withdrawals" class="tab-pane">
+          <div class="table-header-actions">
+            <select id="withdrawal-filter-status" onchange="AdminApp.fetchWithdrawals()">
+              <option value="">All Statuses</option>
+              <option value="PENDING">PENDING</option>
+              <option value="PROCESSING">PROCESSING</option>
+              <option value="APPROVED">APPROVED</option>
+              <option value="PAID">PAID</option>
+              <option value="REJECTED">REJECTED</option>
+            </select>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>User ID</th>
+                  <th>Amount</th>
+                  <th>Coins</th>
+                  <th>Method</th>
+                  <th>Account Details</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="withdrawals-table-body">
+                <tr><td colspan="9" class="text-center">Loading withdrawals...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ================= TAB: TASKS ================= -->
+        <section id="tab-tasks" class="tab-pane">
+          <div class="table-header-actions">
+            <button class="btn btn-primary" onclick="AdminApp.openCreateTaskModal()">+ New Task</button>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Reward</th>
+                  <th>Verification</th>
+                  <th>Status</th>
+                  <th>Action URL</th>
+                </tr>
+              </thead>
+              <tbody id="tasks-table-body">
+                <tr><td colspan="6" class="text-center">Loading tasks...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ================= TAB: FRAUD ================= -->
+        <section id="tab-fraud" class="tab-pane">
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>User ID</th>
+                  <th>Event Type</th>
+                  <th>Severity</th>
+                  <th>Details</th>
+                  <th>IP Address</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody id="fraud-table-body">
+                <tr><td colspan="7" class="text-center">No fraud events detected.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ================= TAB: SETTINGS ================= -->
+        <section id="tab-settings" class="tab-pane">
+          <div class="section-card">
+            <h3>App Economics & Payout Thresholds</h3>
+            <div id="settings-container" class="settings-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB: LOGS ================= -->
+        <section id="tab-logs" class="tab-pane">
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Admin</th>
+                  <th>Action Type</th>
+                  <th>Target User</th>
+                  <th>Details</th>
+                  <th>IP Address</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody id="logs-table-body">
+                <tr><td colspan="7" class="text-center">Loading audit logs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- User Detail & Balance Adjustment Modal -->
+  <div id="modal-adjust-user" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="adjust-user-title">User Profile & Adjustment</h3>
+        <button class="btn-close" onclick="AdminApp.closeModal('modal-adjust-user')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="adjust-user-details" class="user-detail-panel"></div>
+
+        <form id="form-adjust-balance" onsubmit="AdminApp.submitBalanceAdjustment(event)">
+          <input type="hidden" id="adjust-user-id" />
+          <div class="form-group">
+            <label>Adjust Coins (Positive to Add, Negative to Deduct)</label>
+            <input type="number" id="adjust-coins-input" placeholder="+100 or -50" required />
+          </div>
+          <div class="form-group">
+            <label>Audited Reason (Immutable)</label>
+            <input type="text" id="adjust-reason-input" placeholder="e.g. Promotional grant or disputed task" required />
+          </div>
+          <button type="submit" class="btn btn-primary">Apply Adjustment</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Withdrawal Action Modal -->
+  <div id="modal-withdrawal-action" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Process Withdrawal Payout</h3>
+        <button class="btn-close" onclick="AdminApp.closeModal('modal-withdrawal-action')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-withdrawal-action" onsubmit="AdminApp.submitWithdrawalAction(event)">
+          <input type="hidden" id="action-withdrawal-id" />
+          
+          <div class="form-group">
+            <label>Action / Status</label>
+            <select id="action-status-select">
+              <option value="APPROVED">APPROVE (Awaiting Payout)</option>
+              <option value="PAID">MARK PAID (Disbursed)</option>
+              <option value="REJECTED">REJECT (Automatically Refunds Coins to User)</option>
+              <option value="CANCELLED">CANCEL (Refunds Coins)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Admin Notes / Transaction Ref</label>
+            <input type="text" id="action-notes-input" placeholder="e.g. UTR #123456789 or Invalid UPI ID" />
+          </div>
+
+          <button type="submit" class="btn btn-primary">Update Status</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task Create Modal -->
+  <div id="modal-create-task" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Create New Task</h3>
+        <button class="btn-close" onclick="AdminApp.closeModal('modal-create-task')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-create-task" onsubmit="AdminApp.submitCreateTask(event)">
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="task-title" required />
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="task-desc" rows="3" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Reward Coins</label>
+            <input type="number" id="task-reward" value="25" min="1" required />
+          </div>
+          <div class="form-group">
+            <label>Action URL (Optional)</label>
+            <input type="url" id="task-url" placeholder="https://..." />
+          </div>
+          <div class="form-group">
+            <label>Verification Method</label>
+            <select id="task-method">
+              <option value="URL_VISIT">URL Visit</option>
+              <option value="TELEGRAM_CHANNEL">Telegram Channel</option>
+              <option value="REWARD_MILESTONE">Reward Milestone</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Create Task</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/admin-portal/js/admin_api.js"></script>
+  <script src="/admin-portal/js/admin.js"></script>
+</body>
+</html>
