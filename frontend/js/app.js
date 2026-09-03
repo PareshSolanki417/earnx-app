@@ -29,6 +29,7 @@ const App = {
     await WalletManager.fetchWallet();
     await TasksManager.fetchDailyBonusStatus();
     await AdsManager.checkStatus();
+    AdsManager.initInAppAds();
 
     // 4. Setup Event Listeners
     this.setupEventListeners();

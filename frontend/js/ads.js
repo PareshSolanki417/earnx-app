@@ -26,6 +26,38 @@ const AdsManager = {
     }
   },
 
+  inAppInitialized: false,
+
+  initInAppAds() {
+    if (this.inAppInitialized) return;
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      if (typeof window.show_11715052 === 'function') {
+        clearInterval(interval);
+        try {
+          // Activate Monetag In-App Interstitial format
+          window.show_11715052({
+            type: 'inApp',
+            inAppSettings: {
+              frequency: 2,
+              capping: 0.1,
+              interval: 30,
+              timeout: 5,
+              everyPage: false
+            }
+          });
+          this.inAppInitialized = true;
+          console.info('✅ Monetag In-App Interstitial activated successfully.');
+        } catch (e) {
+          console.warn('Monetag inApp init warning:', e);
+        }
+      } else if (attempts > 20) {
+        clearInterval(interval);
+      }
+    }, 1000);
+  },
+
   async startAdSession() {
     if (this.isWatching || this.remainingSeconds > 0) return;
 
@@ -36,6 +68,14 @@ const AdsManager = {
     btn.disabled = true;
     btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> LOADING OFFER...';
 
+    // Wait up to 2.5 seconds if Monetag SDK is still loading
+    if (typeof window.show_11715052 !== 'function') {
+      for (let i = 0; i < 5; i++) {
+        await new Promise(r => setTimeout(r, 500));
+        if (typeof window.show_11715052 === 'function') break;
+      }
+    }
+
     try {
       const initData = await API.post('/ads/start', { ad_type: 'rewarded' });
       
@@ -43,7 +83,11 @@ const AdsManager = {
       if (typeof window.show_11715052 === 'function') {
         btnText.innerHTML = '<i class="fa-solid fa-play"></i> PLAYING SPONSOR AD...';
         
-        window.show_11715052().then(async () => {
+        // Try standard rewarded interstitial, or fallback to rewarded popup format
+        const adPromise = window.show_11715052()
+          .catch(() => window.show_11715052('pop'));
+
+        adPromise.then(async () => {
           btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> VERIFYING REWARD...';
           try {
             const verifyRes = await API.post('/monetag/postback', {
@@ -98,7 +142,7 @@ const AdsManager = {
       } else {
         // 3. Fallback when Monetag tag script is waiting to load
         btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> LOADING AD TAG...';
-        App.showToast('Ad service is connecting, please try again in a moment.', 'info');
+        App.showToast('Connecting to Monetag ad network, please try again.', 'info');
         this.resetBtn();
         this.isWatching = false;
       }
