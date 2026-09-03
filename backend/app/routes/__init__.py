@@ -8,6 +8,7 @@ from app.routes.withdrawals import router as withdrawals_router
 from app.routes.notifications import router as notifications_router
 from app.routes.admin import router as admin_router
 from app.routes.bot_webhook import router as bot_webhook_router
+from app.routes.adsgram import router as adsgram_router
 
 __all__ = [
     "auth_router",
@@ -20,4 +21,5 @@ __all__ = [
     "notifications_router",
     "admin_router",
     "bot_webhook_router",
+    "adsgram_router",
 ]
