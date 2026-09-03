@@ -32,28 +32,54 @@ const AdsManager = {
     try {
       const initData = await API.post('/ads/start', { ad_type: 'rewarded' });
       
-      // Simulate video view in development mode
-      if (initData.is_mock) {
+      // 1. If Monetag live rewarded SDK function is loaded
+      if (typeof window.show_11715052 === 'function') {
+        btnText.innerHTML = '<i class="fa-solid fa-play"></i> PLAYING SPONSOR AD...';
+        
+        window.show_11715052().then(async () => {
+          btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> VERIFYING REWARD...';
+          try {
+            const verifyRes = await API.post('/monetag/postback', {
+              sub_id: String(App.user.id),
+              event_id: initData.event_id,
+              zone_id: "11715052",
+              payout: 0.005,
+              token: "monetag_verified"
+            });
+
+            App.showToast(`🎉 Reward Received! +${verifyRes.coins_credited} Coins`, 'success');
+            await WalletManager.fetchWallet();
+            App.fetchUserData();
+            this.startCooldown(initData.cooldown_seconds);
+          } catch (postbackErr) {
+            App.showToast(postbackErr.message, 'error');
+            this.resetBtn();
+          } finally {
+            this.isWatching = false;
+          }
+        }).catch(err => {
+          console.warn('Monetag ad cancelled or failed:', err);
+          App.showToast('Ad was closed early or could not load.', 'error');
+          this.resetBtn();
+          this.isWatching = false;
+        });
+      } else if (initData.is_mock) {
+        // 2. Mock simulation for development
         btnText.innerHTML = '<i class="fa-solid fa-video fa-fade"></i> WATCHING VIDEO (3s)...';
 
         setTimeout(async () => {
           try {
-            // Trigger backend postback verification
             const verifyRes = await API.post('/monetag/postback', {
               sub_id: String(App.user.id),
               event_id: initData.event_id,
-              zone_id: initData.zone_id,
+              zone_id: initData.zone_id || "11715052",
               payout: 0.005,
               token: "mock_signature_valid"
             });
 
             App.showToast(`🎉 Reward Received! +${verifyRes.coins_credited} Coins`, 'success');
-            
-            // Refresh wallet balance
             await WalletManager.fetchWallet();
             App.fetchUserData();
-
-            // Start cooldown
             this.startCooldown(initData.cooldown_seconds);
           } catch (postbackErr) {
             App.showToast(postbackErr.message, 'error');
@@ -63,12 +89,10 @@ const AdsManager = {
           }
         }, 3000);
       } else {
-        // Production Monetag Tag Integration
-        // If Monetag Web SDK is loaded: window.show_rewarded_tag()
-        btnText.innerHTML = '<i class="fa-solid fa-hourglass-half"></i> VERIFYING EVENT...';
-        // The backend receives the postback from Monetag server-to-server
-        App.showToast('Please complete the sponsor offer to verify your reward.', 'success');
-        this.startCooldown(initData.cooldown_seconds);
+        // 3. Fallback when Monetag tag script is waiting to load
+        btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> LOADING AD TAG...';
+        App.showToast('Ad service is connecting, please try again in a moment.', 'info');
+        this.resetBtn();
         this.isWatching = false;
       }
     } catch (err) {
