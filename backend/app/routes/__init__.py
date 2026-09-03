@@ -7,6 +7,7 @@ from app.routes.referral import router as referral_router
 from app.routes.withdrawals import router as withdrawals_router
 from app.routes.notifications import router as notifications_router
 from app.routes.admin import router as admin_router
+from app.routes.bot_webhook import router as bot_webhook_router
 
 __all__ = [
     "auth_router",
@@ -18,4 +19,5 @@ __all__ = [
     "withdrawals_router",
     "notifications_router",
     "admin_router",
+    "bot_webhook_router",
 ]
