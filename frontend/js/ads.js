@@ -18,6 +18,31 @@ const AdsManager = {
           el.innerText = `+${rc.toFixed(0)} Coins (₹${(rc / 100).toFixed(2)})`;
         }
       }
+
+      // Update Daily Limit progress UI
+      const watched = data.watched_today || 0;
+      const limit = data.daily_limit || 20;
+      const progressEl = document.getElementById('daily-ads-progress');
+      const barEl = document.getElementById('daily-ads-bar');
+      const btn = document.getElementById('btn-watch-ad');
+      const btnText = document.getElementById('btn-watch-text');
+
+      if (progressEl) {
+        progressEl.innerText = `${watched} / ${limit} Watched`;
+      }
+      if (barEl && limit > 0) {
+        const pct = Math.min(100, Math.round((watched / limit) * 100));
+        barEl.style.width = `${pct}%`;
+      }
+
+      if (data.daily_limit_reached) {
+        if (btn && btnText) {
+          btn.disabled = true;
+          btnText.innerText = `DAILY LIMIT REACHED (${limit}/${limit})`;
+        }
+        return;
+      }
+
       if (!data.can_watch && data.cooldown_seconds > 0) {
         this.startCooldown(data.cooldown_seconds);
       }

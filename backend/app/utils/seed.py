@@ -42,6 +42,7 @@ def seed_database(db: Session):
         ("DAILY_BONUS_DAY_5", "30.0", "Coins for Day 5 check-in"),
         ("DAILY_BONUS_DAY_6", "40.0", "Coins for Day 6 check-in"),
         ("DAILY_BONUS_DAY_7", "50.0", "Coins for Day 7 check-in"),
+        ("DAILY_AD_LIMIT", "20", "Maximum rewarded ads a user can watch per day (15 to 25 to maximize network CPM)"),
         ("ESTIMATED_REVENUE_PER_AD_RUPEES", "0.35", "Estimated gross advertising payout per completed ad (for margin analysis)"),
     ]
 

@@ -360,6 +360,17 @@ const AdminApp = {
                 </div>
                 <small style="color: var(--text-sub); font-size: 12px; display: block; margin-top: 4px;">Used for calculating platform profit margin</small>
               </div>
+
+              <div class="setting-field">
+                <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">
+                  Daily Ad Limit per User (Ads/day):
+                </label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="number" id="setting-DAILY_AD_LIMIT" value="${map['DAILY_AD_LIMIT'] || '20'}" min="1" max="100" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: #fff;" />
+                  <button class="btn btn-primary btn-small" onclick="AdminApp.saveSetting('DAILY_AD_LIMIT')">Save</button>
+                </div>
+                <small style="color: var(--emerald); font-size: 12px; display: block; margin-top: 4px;">Recommended: 15 to 25 to maximize network CPM rates</small>
+              </div>
             </div>
           </div>
 

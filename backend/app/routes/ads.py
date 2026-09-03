@@ -33,7 +33,15 @@ def start_ad(
     """
     client_ip = get_client_ip(request)
 
-    # Check cooldown
+    # 1. Check daily ad limit (e.g. 15 to 25 ads per day)
+    can_watch_daily, watched_today, max_limit = fraud_service.check_daily_ad_limit(db, user.id)
+    if not can_watch_daily:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Daily ad limit reached ({watched_today}/{max_limit} ads). Please return tomorrow!",
+        )
+
+    # 2. Check cooldown
     if not fraud_service.check_ad_cooldown(db, user.id, client_ip):
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -63,15 +71,20 @@ def check_ad_status(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Checks whether the user is currently eligible to watch an ad or is on cooldown."""
+    """Checks whether the user is currently eligible to watch an ad, on cooldown, or reached daily limit."""
     client_ip = get_client_ip(request)
-    can_watch = fraud_service.check_ad_cooldown(db, user.id, client_ip)
+    cooldown_ok = fraud_service.check_ad_cooldown(db, user.id, client_ip)
+    daily_ok, watched_today, max_limit = fraud_service.check_daily_ad_limit(db, user.id)
+    can_watch = cooldown_ok and daily_ok
     reward_coins = monetag_service.get_ad_reward_coins(db)
 
     return {
         "can_watch": can_watch,
-        "cooldown_seconds": settings.MIN_SECONDS_BETWEEN_ADS if not can_watch else 0,
+        "cooldown_seconds": settings.MIN_SECONDS_BETWEEN_ADS if not cooldown_ok else 0,
         "reward_coins": reward_coins,
+        "watched_today": watched_today,
+        "daily_limit": max_limit,
+        "daily_limit_reached": not daily_ok,
     }
 
 

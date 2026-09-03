@@ -189,6 +189,18 @@
             <i class="fa-solid fa-clock"></i> Next ad available in: <span id="cooldown-seconds">60</span>s
           </div>
 
+          <!-- Daily Ad Limit Tracker -->
+          <div class="daily-ad-counter-badge" style="margin-top: 15px; background: rgba(255,255,255,0.04); padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border-color); text-align: center;">
+            <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 8px;">
+              <span>Daily Ad Limit</span>
+              <span id="daily-ads-progress" style="color: var(--gold);">0 / 20 Watched</span>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); height: 6px; border-radius: 4px; overflow: hidden;">
+              <div id="daily-ads-bar" style="background: var(--primary); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+            </div>
+            <small style="font-size: 11px; color: var(--text-sub); display: block; margin-top: 6px;">Reset daily at 00:00 UTC</small>
+          </div>
+
           <!-- Safe Policy rules -->
           <div class="security-rules-card">
             <h4><i class="fa-solid fa-shield-halved"></i> Fair Play Rules</h4>

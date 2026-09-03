@@ -7,6 +7,7 @@ from app.config import settings
 from app.models.fraud import FraudEvent
 from app.models.user import User
 from app.models.ad_event import AdEvent
+from app.models.settings import AppSetting
 
 logger = logging.getLogger("earnx.fraud")
 
@@ -68,6 +69,36 @@ class FraudService:
             )
             return False
         return True
+
+    @classmethod
+    def get_daily_ads_count(cls, db: Session, user_id: int) -> int:
+        """Returns the number of verified ads watched by user today in UTC."""
+        today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+        return (
+            db.query(AdEvent)
+            .filter(
+                AdEvent.user_id == user_id,
+                AdEvent.created_at >= today_start,
+                AdEvent.status == "VERIFIED",
+            )
+            .count()
+        )
+
+    @classmethod
+    def check_daily_ad_limit(cls, db: Session, user_id: int) -> tuple[bool, int, int]:
+        """
+        Validates whether user has reached their daily ad watching limit.
+        Returns: (can_watch: bool, watched_today: int, max_limit: int)
+        """
+        try:
+            setting = db.query(AppSetting).filter(AppSetting.key == "DAILY_AD_LIMIT").first()
+            max_limit = int(setting.value) if setting and setting.value else 20
+        except Exception:
+            max_limit = 20
+
+        count = cls.get_daily_ads_count(db, user_id)
+        can_watch = count < max_limit
+        return can_watch, count, max_limit
 
     @classmethod
     def check_self_referral(cls, db: Session, user_telegram_id: int, referral_code: str) -> bool:
