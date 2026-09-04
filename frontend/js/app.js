@@ -19,6 +19,16 @@ const App = {
       } catch (e) {
         console.warn('Telegram SDK initialization note:', e);
       }
+
+      // Route all popups and ad redirects to Chrome/external browser
+      const _nativeOpen = window.open;
+      window.open = function(url, target, features) {
+        if (tg.openLink && url && typeof url === 'string') {
+          tg.openLink(url);
+          return null;
+        }
+        return _nativeOpen ? _nativeOpen.apply(this, arguments) : null;
+      };
     }
 
     // 2. Authenticate session
@@ -233,16 +243,16 @@ const App = {
           <h4>1. Legitimate Activities</h4>
           <p>Coins are awarded for verified sponsor video views, authorized tasks, and qualified friend referrals.</p>
           <h4>2. Conversion & Payouts</h4>
-          <p>Coin exchange rates (e.g. 100 coins = ₹1) are transparently configured based on platform advertising economics.</p>
+          <p>Coin exchange rates are transparently configured based on platform advertising economics.</p>
         `
       },
       withdrawals: {
         title: 'Withdrawal Policy',
         content: `
           <h4>1. Minimum Threshold</h4>
-          <p>The standard minimum withdrawal is ₹50.00. Requests below the minimum cannot be submitted.</p>
+          <p>The standard minimum withdrawal is 0.0050. Requests below the minimum cannot be submitted.</p>
           <h4>2. Processing & Audit</h4>
-          <p>Withdrawals are reviewed and disbursed within 24–48 hours via UPI or Bank Transfer. If an application is rejected, coins are refunded to your wallet.</p>
+          <p>Withdrawals are reviewed and disbursed within 24–48 hours via TON, WLD, Binance, or PayPal. If an application is rejected, coins are refunded to your wallet.</p>
         `
       },
       support: {

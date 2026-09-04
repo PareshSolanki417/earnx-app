@@ -37,7 +37,7 @@ const WalletManager = {
     if (wCoins) wCoins.textContent = coins;
     if (wPending) wPending.textContent = `${parseFloat(this.walletData.pending_coins).toFixed(0)} Coins`;
     if (wLifetime) wLifetime.textContent = `${parseFloat(this.walletData.lifetime_earned).toFixed(0)} Coins`;
-    if (modalRupees) modalRupees.textContent = `₹${rupees}`;
+    if (modalRupees) modalRupees.textContent = `${rupees}`;
   },
 
   async fetchTransactions() {

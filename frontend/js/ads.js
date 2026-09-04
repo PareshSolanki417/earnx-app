@@ -15,7 +15,7 @@ const AdsManager = {
         const rc = parseFloat(data.reward_coins);
         const el = document.getElementById('watch-reward-val');
         if (el) {
-          el.innerText = `+${rc.toFixed(0)} Coins (₹${(rc / 100).toFixed(2)})`;
+          el.innerText = `+${rc.toFixed(0)} Coins`;
         }
       }
 
@@ -88,6 +88,44 @@ const AdsManager = {
   ADSGRAM_INT_BLOCK_ID: "int-45940",
   ADSGRAM_TASK_BLOCK_ID: "task-45941",
 
+  waitingInterval: null,
+
+  startWaitingForBrowserAd(eventId, cooldownSeconds, initialCoins) {
+    const btn = document.getElementById('btn-watch-ad');
+    const btnText = document.getElementById('btn-watch-text');
+    if (btnText) btnText.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square"></i> AD OPENED IN CHROME...';
+
+    let elapsed = 0;
+    if (this.waitingInterval) clearInterval(this.waitingInterval);
+
+    this.waitingInterval = setInterval(async () => {
+      elapsed += 2;
+      try {
+        await WalletManager.fetchWallet();
+        const currentCoins = parseFloat(WalletManager.walletData?.available_coins || 0);
+        if (currentCoins > initialCoins) {
+          clearInterval(this.waitingInterval);
+          this.waitingInterval = null;
+          App.showToast('🎉 Ad Completed in Browser! Coins Credited', 'success');
+          App.fetchUserData();
+          await this.checkStatus();
+          this.startCooldown(cooldownSeconds);
+          this.isWatching = false;
+          return;
+        }
+      } catch (e) {
+        console.warn('Waiting poll error:', e);
+      }
+
+      if (elapsed >= 120) {
+        clearInterval(this.waitingInterval);
+        this.waitingInterval = null;
+        this.resetBtn();
+        this.isWatching = false;
+      }
+    }, 2000);
+  },
+
   async startAdSession() {
     if (this.isWatching || this.remainingSeconds > 0) return;
 
@@ -96,87 +134,23 @@ const AdsManager = {
 
     this.isWatching = true;
     btn.disabled = true;
-    btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> LOADING OFFER...';
+    btnText.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square fa-fade"></i> OPENING CHROME...';
 
     try {
       const initData = await API.post('/ads/start', { ad_type: 'rewarded' });
       
-      // 1. PRIMARY: Try Adsgram Native Telegram Rewarded Video (Block ID: 45936)
-      if (window.Adsgram && this.ADSGRAM_REWARD_BLOCK_ID) {
-        btnText.innerHTML = '<i class="fa-solid fa-play"></i> PLAYING SPONSOR AD...';
-        try {
-          const adController = window.Adsgram.init({ blockId: this.ADSGRAM_REWARD_BLOCK_ID });
-          const result = await adController.show();
-          // STRICT CHECK: User MUST have watched ad to full completion (result.done === true)
-          if (result && result.done === true) {
-            btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> VERIFYING REWARD...';
-            const targetId = App.user.telegram_id || App.user.id;
-            const verifyRes = await API.get(`/adsgram/reward?userid=${targetId}`);
-            App.showToast(`🎉 Reward Received! +${verifyRes.coins_credited || 10} Coins`, 'success');
-            await WalletManager.fetchWallet();
-            App.fetchUserData();
-            await this.checkStatus();
-            this.startCooldown(initData.cooldown_seconds);
-            this.isWatching = false;
-            return;
-          } else {
-            console.warn('Adsgram ad finished without verified completion:', result);
-          }
-        } catch (adsgramErr) {
-          console.warn('Adsgram ad failed or was blocked by Private DNS:', adsgramErr);
-        }
+      const currentCoins = parseFloat(WalletManager.walletData?.available_coins || 0);
+      const adViewerUrl = `${window.location.origin}/view-ad.html?uid=${App.user.id}&event_id=${initData.event_id}&zone_id=11715052`;
+
+      // Open ad in Google Chrome or default external browser
+      if (window.Telegram?.WebApp?.openLink) {
+        App.showToast('🌐 Opening ad in Chrome browser...', 'info');
+        window.Telegram.WebApp.openLink(adViewerUrl);
+      } else {
+        window.open(adViewerUrl, '_blank');
       }
 
-      // 2. SECONDARY: Fallback to Monetag Rewarded Ad (Zone 11715052)
-      if (typeof window.show_11715052 === 'function') {
-        btnText.innerHTML = '<i class="fa-solid fa-play"></i> PLAYING SPONSOR AD...';
-        try {
-          // Play standard rewarded interstitial
-          await window.show_11715052();
-          btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> VERIFYING REWARD...';
-          const verifyRes = await API.post('/monetag/postback', {
-            sub_id: String(App.user.id),
-            event_id: initData.event_id,
-            zone_id: "11715052",
-            payout: 0.005,
-            token: "monetag_verified"
-          });
-          App.showToast(`🎉 Reward Received! +${verifyRes.coins_credited} Coins`, 'success');
-          await WalletManager.fetchWallet();
-          App.fetchUserData();
-          await this.checkStatus();
-          this.startCooldown(initData.cooldown_seconds);
-          this.isWatching = false;
-          return;
-        } catch (monetagErr) {
-          console.warn('Monetag video rejected or failed, trying popup fallback...', monetagErr);
-          try {
-            await window.show_11715052('pop');
-            btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> VERIFYING REWARD...';
-            const verifyRes = await API.post('/monetag/postback', {
-              sub_id: String(App.user.id),
-              event_id: initData.event_id,
-              zone_id: "11715052",
-              payout: 0.005,
-              token: "monetag_verified"
-            });
-            App.showToast(`🎉 Reward Received! +${verifyRes.coins_credited} Coins`, 'success');
-            await WalletManager.fetchWallet();
-            App.fetchUserData();
-            await this.checkStatus();
-            this.startCooldown(initData.cooldown_seconds);
-            this.isWatching = false;
-            return;
-          } catch (popErr) {
-            console.warn('Monetag popup also failed or closed early:', popErr);
-          }
-        }
-      }
-
-      // 3. If ad was blocked by DNS or failed to play: NO COINS GIVEN!
-      App.showToast('⚠️ Ad failed to load! Please disable Private DNS or AdBlocker to earn coins.', 'error');
-      this.resetBtn();
-      this.isWatching = false;
+      this.startWaitingForBrowserAd(initData.event_id, initData.cooldown_seconds, currentCoins);
     } catch (err) {
       App.showToast(err.message || 'Ad session could not start', 'error');
       this.resetBtn();

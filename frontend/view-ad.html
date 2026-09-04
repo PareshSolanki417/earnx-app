@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>EarnX - Watching Sponsor Ad</title>
+  
+  <!-- Monetag Rewarded Ads SDK -->
+  <script src="//libtl.com/sdk.js" data-zone="11715052" data-sdk="show_11715052"></script>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-surface: #111827;
+      --primary: #6366f1;
+      --primary-gradient: linear-gradient(135deg, #6366f1, #a855f7);
+      --gold: #fbbf24;
+      --gold-gradient: linear-gradient(135deg, #fbbf24, #f59e0b);
+      --emerald: #10b981;
+      --rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1e1b4b 0%, var(--bg-dark) 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .ad-card {
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 32px 24px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .brand-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff 30%, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+    }
+
+    .status-icon-box {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 2px solid rgba(99, 102, 241, 0.3);
+      color: var(--primary);
+      transition: all 0.3s ease;
+    }
+
+    .status-icon-box.success {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: var(--emerald);
+    }
+
+    .status-icon-box.error {
+      background: rgba(244, 63, 94, 0.15);
+      border-color: rgba(244, 63, 94, 0.4);
+      color: var(--rose);
+    }
+
+    .status-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .status-desc {
+      font-size: 14px;
+      color: var(--text-sub);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .reward-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(251, 191, 36, 0.15);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      padding: 8px 16px;
+      border-radius: 20px;
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 24px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--primary-gradient);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      margin-top: 10px;
+    }
+
+    .progress-bar-container {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      height: 8px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--primary-gradient);
+      transition: width 0.4s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ad-card">
+    <div class="brand-title">EarnX Rewards</div>
+
+    <div id="status-icon" class="status-icon-box">
+      <i id="icon-inner" class="fa-solid fa-spinner fa-spin"></i>
+    </div>
+
+    <div class="reward-pill" id="reward-pill">
+      <i class="fa-solid fa-coins"></i>
+      <span>+10 Coins</span>
+    </div>
+
+    <h3 class="status-title" id="status-title">Launching Sponsor Ad...</h3>
+    <p class="status-desc" id="status-desc">Please watch the full ad offer in this browser window to verify your reward.</p>
+
+    <div class="progress-bar-container" id="progress-container">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+
+    <div id="action-area">
+      <button id="btn-play-manual" class="btn btn-primary" onclick="launchAd()" style="display: none;">
+        <i class="fa-solid fa-play"></i> Watch Ad Now
+      </button>
+      <a id="btn-return" href="https://t.me/EarnX_App_bot" class="btn btn-primary" style="display: none;">
+        <i class="fa-brands fa-telegram"></i> Return to Telegram Bot
+      </a>
+      <button id="btn-close-window" class="btn btn-secondary" onclick="window.close()" style="display: none;">
+        Close Tab
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const uid = params.get('uid');
+    const eventId = params.get('event_id');
+    const zoneId = params.get('zone_id') || '11715052';
+
+    const iconEl = document.getElementById('status-icon');
+    const iconInner = document.getElementById('icon-inner');
+    const titleEl = document.getElementById('status-title');
+    const descEl = document.getElementById('status-desc');
+    const progressFill = document.getElementById('progress-fill');
+    const progressContainer = document.getElementById('progress-container');
+    const btnPlay = document.getElementById('btn-play-manual');
+    const btnReturn = document.getElementById('btn-return');
+    const btnClose = document.getElementById('btn-close-window');
+
+    let adPlayed = false;
+
+    async function init() {
+      if (!uid || !eventId) {
+        showError('Invalid ad session parameters. Please restart from EarnX.');
+        return;
+      }
+
+      progressFill.style.width = '30%';
+      
+      // Wait for Monetag script to be ready
+      let attempts = 0;
+      const checkSdk = setInterval(() => {
+        attempts++;
+        if (typeof window.show_11715052 === 'function') {
+          clearInterval(checkSdk);
+          progressFill.style.width = '60%';
+          launchAd();
+        } else if (attempts > 15) {
+          clearInterval(checkSdk);
+          showError('Ad could not load! Please disable Private DNS or AdBlocker to view ads and earn coins.');
+          btnPlay.style.display = 'inline-flex';
+          btnPlay.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Try Again';
+        }
+      }, 300);
+    }
+
+    async function launchAd() {
+      if (adPlayed) return;
+      btnPlay.style.display = 'none';
+
+      titleEl.innerText = 'Playing Sponsor Ad...';
+      descEl.innerText = 'Please wait while the video or offer is displayed.';
+      iconInner.className = 'fa-solid fa-video fa-fade';
+      progressFill.style.width = '80%';
+
+      try {
+        if (typeof window.show_11715052 === 'function') {
+          await window.show_11715052().catch(() => window.show_11715052('pop'));
+          await verifyReward();
+        } else {
+          showError('Ad script blocked. Please turn off AdBlocker or Private DNS.');
+        }
+      } catch (err) {
+        console.warn('Ad error or early close:', err);
+        showError('Ad was closed early or failed to complete. Full view is required to earn coins.');
+        btnPlay.style.display = 'inline-flex';
+      }
+    }
+
+    async function verifyReward() {
+      adPlayed = true;
+      titleEl.innerText = 'Verifying Reward...';
+      descEl.innerText = 'Crediting coins securely to your EarnX account.';
+      iconInner.className = 'fa-solid fa-spinner fa-spin';
+      progressFill.style.width = '95%';
+
+      try {
+        const res = await fetch('/api/monetag/postback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sub_id: String(uid),
+            event_id: eventId,
+            zone_id: zoneId,
+            payout: 0.005,
+            token: 'monetag_verified'
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showSuccess(data.coins_credited || 10);
+        } else {
+          showError(data.detail || 'Verification rejected. Please try again.');
+        }
+      } catch (e) {
+        showError('Could not connect to EarnX server. Check internet connection.');
+      }
+    }
+
+    function showSuccess(coins) {
+      progressFill.style.width = '100%';
+      iconEl.className = 'status-icon-box success';
+      iconInner.className = 'fa-solid fa-check';
+      titleEl.innerText = '🎉 Reward Received!';
+      descEl.innerHTML = `Successfully added <strong>+${coins} Coins</strong> to your EarnX account!<br>You can now return to the Telegram bot.`;
+      
+      btnReturn.style.display = 'inline-flex';
+      btnClose.style.display = 'inline-flex';
+    }
+
+    function showError(msg) {
+      iconEl.className = 'status-icon-box error';
+      iconInner.className = 'fa-solid fa-triangle-exclamation';
+      titleEl.innerText = 'Ad Verification Incomplete';
+      descEl.innerText = msg;
+      progressContainer.style.display = 'none';
+      btnReturn.style.display = 'inline-flex';
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
