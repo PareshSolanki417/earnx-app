@@ -64,7 +64,7 @@ async def telegram_webhook(request: Request, background_tasks: BackgroundTasks) 
         ref_code = parts[1].strip().upper() if len(parts) > 1 else None
 
         base_url = settings.WEBAPP_URL.rstrip("/")
-        version_param = "v=20260904_03"
+        version_param = "v=20260904_04"
         app_url = f"{base_url}/?{version_param}&startapp={ref_code}" if ref_code else f"{base_url}/?{version_param}"
 
         reply_text = (

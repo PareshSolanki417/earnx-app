@@ -25,7 +25,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     # Construct WebApp URL with start parameter for referral routing
     base_url = settings.WEBAPP_URL.rstrip("/")
-    version_param = "v=20260904_03"
+    version_param = "v=20260904_04"
     app_url = f"{base_url}/?{version_param}&startapp={referral_code}" if referral_code else f"{base_url}/?{version_param}"
 
     welcome_text = (

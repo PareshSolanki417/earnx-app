@@ -21,7 +21,6 @@ from app.routes import (
     notifications_router,
     admin_router,
     bot_webhook_router,
-    adsgram_router,
     paymentwall_router,
 )
 
@@ -111,7 +110,6 @@ app.include_router(withdrawals_router, prefix=settings.API_V1_STR)
 app.include_router(notifications_router, prefix=settings.API_V1_STR)
 app.include_router(admin_router, prefix=settings.API_V1_STR)
 app.include_router(bot_webhook_router, prefix=settings.API_V1_STR)
-app.include_router(adsgram_router, prefix=settings.API_V1_STR)
 app.include_router(paymentwall_router, prefix=settings.API_V1_STR)
 
 # Static file serving for Frontend and Admin Portal

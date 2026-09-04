@@ -83,11 +83,6 @@ const AdsManager = {
     }, 1000);
   },
 
-  // Adsgram Ad Block IDs
-  ADSGRAM_REWARD_BLOCK_ID: "45936",
-  ADSGRAM_INT_BLOCK_ID: "int-45940",
-  ADSGRAM_TASK_BLOCK_ID: "task-45941",
-
   waitingInterval: null,
 
   startWaitingForBrowserAd(eventId, cooldownSeconds, initialCoins) {
@@ -141,7 +136,7 @@ const AdsManager = {
       
       const currentCoins = parseFloat(WalletManager.walletData?.available_coins || 0);
       const baseHost = window.location.origin || 'https://earnx-app.onrender.com';
-      const adViewerUrl = `${baseHost}/view-ad.html?v=20260904_03&uid=${App.user.id}&event_id=${initData.event_id}&zone_id=11715052`;
+      const adViewerUrl = `${baseHost}/view-ad.html?v=20260904_04&uid=${App.user.id}&event_id=${initData.event_id}&zone_id=11715052`;
 
       // Open ad in Google Chrome or default external browser
       if (window.Telegram?.WebApp?.openLink) {
@@ -156,37 +151,6 @@ const AdsManager = {
       App.showToast(err.message || 'Ad session could not start', 'error');
       this.resetBtn();
       this.isWatching = false;
-    }
-  },
-
-  showInterstitial() {
-    if (window.Adsgram && this.ADSGRAM_INT_BLOCK_ID) {
-      try {
-        const intController = window.Adsgram.init({ blockId: this.ADSGRAM_INT_BLOCK_ID });
-        intController.show().catch(e => console.log('Adsgram interstitial skipped:', e));
-      } catch (e) {}
-    }
-  },
-
-  async playAdsgramTask() {
-    if (!window.Adsgram || !this.ADSGRAM_TASK_BLOCK_ID) {
-      App.showToast('Task ad service not available. Please disable AdBlocker.', 'info');
-      return;
-    }
-    try {
-      const taskController = window.Adsgram.init({ blockId: this.ADSGRAM_TASK_BLOCK_ID });
-      const res = await taskController.show();
-      if (res && res.done === true) {
-        const targetId = App.user.telegram_id || App.user.id;
-        await API.get(`/adsgram/reward?userid=${targetId}`);
-        App.showToast('🎉 Task Completed! +15 Bonus Coins credited', 'success');
-        await WalletManager.fetchWallet();
-      } else {
-        App.showToast('Task was not completed. No coins awarded.', 'info');
-      }
-    } catch (err) {
-      console.warn('Adsgram task error or blocked by DNS:', err);
-      App.showToast('Task failed to load. Please disable Private DNS / AdBlocker.', 'error');
     }
   },
 
