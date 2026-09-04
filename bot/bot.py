@@ -29,13 +29,13 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     welcome_text = (
         f"👋 Hello, *{user.first_name}*!\n\n"
-        "Welcome to *EarnX* — The premier ad-supported reward platform.\n\n"
+        "Welcome to *EarnX* — The premier reward platform.\n\n"
         "🪙 *How to Earn:*\n"
         "• 🎬 Watch verified sponsor video offers\n"
         "• 🎁 Claim consecutive 7-day check-in bonuses\n"
         "• 📋 Complete simple sponsor activities\n"
         "• 👥 Invite friends to earn +50 coins\n\n"
-        "💳 Redeem your verified coins directly to UPI or Bank Transfer!"
+        "💳 Redeem your verified coins directly to TON, WLD, Binance, or PayPal!"
     )
 
     keyboard = [
@@ -44,17 +44,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
                 text="🚀 Open EarnX Mini App",
                 web_app=WebAppInfo(url=app_url),
             )
-        ],
-        [
-            InlineKeyboardButton(
-                text="📢 Official Announcements",
-                url="https://t.me/EarnX_App",
-            ),
-            InlineKeyboardButton(
-                text="💬 Support",
-                url="https://t.me/SolankiPareshm",
-            ),
-        ],
+        ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 

@@ -111,7 +111,7 @@ async def paymentwall_pingback(request: Request, db: Session = Depends(get_db)):
                 user_id=user.id,
                 title="Offerwall Reward Credited!",
                 message=f"You earned +{coins_to_credit} coins from completing an offerwall task.",
-                notification_type="REWARD",
+                type="REWARD",
             )
             db.add(notif)
             db.commit()

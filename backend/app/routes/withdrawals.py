@@ -71,10 +71,18 @@ def create_withdrawal(
     min_rupees = get_min_withdrawal_rupees(db)
     req_rupees = Decimal(str(payload.amount_rupees))
 
+    valid_methods = {"TON", "WLD", "BINANCE", "PAYPAL"}
+    chosen_method = payload.payout_method.strip().upper()
+    if chosen_method not in valid_methods:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid payout method '{payload.payout_method}'. Supported options: TON, WLD, BINANCE, PAYPAL",
+        )
+
     if req_rupees < min_rupees:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Minimum withdrawal amount is ₹{min_rupees:.2f}",
+            detail=f"Minimum withdrawal amount is {min_rupees:.4f}",
         )
 
     # Check pending withdrawal limit (e.g. max 2 pending at a time to prevent flood)
@@ -100,10 +108,10 @@ def create_withdrawal(
             user_id=user.id,
             amount=coins_needed,
             tx_type="WITHDRAWAL",
-            source=f"{payload.payout_method}_REQUEST",
+            source=f"{chosen_method}_REQUEST",
             metadata={
-                "rupees": str(req_rupees),
-                "payout_method": payload.payout_method,
+                "amount": str(req_rupees),
+                "payout_method": chosen_method,
                 "payout_account": payload.payout_account,
             },
             ip_address=client_ip,
@@ -119,7 +127,7 @@ def create_withdrawal(
         user_id=user.id,
         amount_rupees=req_rupees,
         coins_deducted=coins_needed,
-        payout_method=payload.payout_method.upper(),
+        payout_method=chosen_method,
         payout_account=payload.payout_account.strip(),
         account_holder_name=payload.account_holder_name,
         status="PENDING",
@@ -131,7 +139,7 @@ def create_withdrawal(
         Notification(
             user_id=user.id,
             title="Withdrawal Requested ⏳",
-            message=f"Your withdrawal request of ₹{req_rupees:.2f} ({coins_needed:.0f} coins) is submitted and under review.",
+            message=f"Your withdrawal request of {req_rupees} ({coins_needed:.2f} coins) via {chosen_method} is submitted and under review.",
             type="WITHDRAWAL",
         )
     )

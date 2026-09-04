@@ -393,13 +393,13 @@ const AdminApp = {
 
               <div class="setting-field">
                 <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">
-                  Minimum Withdrawal Amount (₹):
+                  Minimum Withdrawal Amount:
                 </label>
                 <div style="display: flex; gap: 8px;">
-                  <input type="number" id="setting-MIN_WITHDRAWAL_RUPEES" value="${map['MIN_WITHDRAWAL_RUPEES'] || '50.0'}" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: #fff;" />
+                  <input type="number" step="0.0001" id="setting-MIN_WITHDRAWAL_RUPEES" value="${map['MIN_WITHDRAWAL_RUPEES'] || '0.0050'}" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: #fff;" />
                   <button class="btn btn-primary btn-small" onclick="AdminApp.saveSetting('MIN_WITHDRAWAL_RUPEES')">Save</button>
                 </div>
-                <small style="color: var(--text-sub); font-size: 12px; display: block; margin-top: 4px;">Minimum threshold for UPI and Bank transfer</small>
+                <small style="color: var(--emerald); font-size: 12px; display: block; margin-top: 4px;">Default: 0.0050 (TON, WLD, Binance, PayPal)</small>
               </div>
             </div>
           </div>

@@ -4,28 +4,28 @@ from app.models.wallet import Wallet
 
 
 def test_withdrawal_below_minimum_rejected(client, user_auth_headers):
-    # Minimum is ₹50; requesting ₹20 must fail
+    # Minimum is 0.0050; requesting 0.0010 must fail
     res = client.post(
         "/api/withdrawals",
         json={
-            "amount_rupees": 20.0,
-            "payout_method": "UPI",
-            "payout_account": "user@upi",
+            "amount_rupees": 0.0010,
+            "payout_method": "TON",
+            "payout_account": "UQ_test_ton_wallet",
         },
         headers=user_auth_headers,
     )
     assert res.status_code == 400
-    assert "Minimum withdrawal amount is ₹50.00" in res.json()["detail"]
+    assert "Minimum withdrawal amount is 0.0050" in res.json()["detail"]
 
 
 def test_withdrawal_insufficient_balance_rejected(client, user_auth_headers):
-    # User only has 200 coins; requesting ₹50 requires 5,000 coins (at 100 coins/₹1)
+    # User only has 200 coins; requesting 10.0 requires 1,000 coins (at 100 coins/unit)
     res = client.post(
         "/api/withdrawals",
         json={
-            "amount_rupees": 50.0,
-            "payout_method": "UPI",
-            "payout_account": "user@upi",
+            "amount_rupees": 10.0,
+            "payout_method": "TON",
+            "payout_account": "UQ_test_ton_wallet",
         },
         headers=user_auth_headers,
     )
@@ -46,13 +46,13 @@ def test_successful_withdrawal_and_refund_on_rejection(
     )
     db_session.commit()
 
-    # Submit valid ₹50 withdrawal
+    # Submit valid TON withdrawal
     res = client.post(
         "/api/withdrawals",
         json={
-            "amount_rupees": 50.0,
-            "payout_method": "UPI",
-            "payout_account": "tester@okaxis",
+            "amount_rupees": 10.0,
+            "payout_method": "TON",
+            "payout_account": "UQ_valid_ton_wallet_address",
             "account_holder_name": "Test User",
         },
         headers=user_auth_headers,
@@ -62,17 +62,17 @@ def test_successful_withdrawal_and_refund_on_rejection(
     assert w_data["status"] == "PENDING"
     withdrawal_id = w_data["id"]
 
-    # Verify 5,000 coins were deducted
+    # Verify 1,000 coins were deducted (10.0 * 100 coins/unit)
     db_session.expire_all()
     wallet = db_session.query(Wallet).filter(Wallet.user_id == test_user.id).first()
     bal_after_withdrawal = Decimal(str(wallet.available_coins))
 
-    # Admin rejects withdrawal -> must automatically refund 5,000 coins back
+    # Admin rejects withdrawal -> must automatically refund 1,000 coins back
     action_res = client.post(
         f"/api/admin/withdrawals/{withdrawal_id}/action",
         json={
             "status": "REJECTED",
-            "admin_notes": "Invalid UPI VPA handle",
+            "admin_notes": "Invalid TON wallet address format",
         },
         headers=admin_auth_headers,
     )
@@ -82,4 +82,4 @@ def test_successful_withdrawal_and_refund_on_rejection(
     # Verify coins were refunded
     db_session.expire_all()
     wallet_after_refund = db_session.query(Wallet).filter(Wallet.user_id == test_user.id).first()
-    assert Decimal(str(wallet_after_refund.available_coins)) == bal_after_withdrawal + Decimal("5000.0")
+    assert Decimal(str(wallet_after_refund.available_coins)) == bal_after_withdrawal + Decimal("1000.0")

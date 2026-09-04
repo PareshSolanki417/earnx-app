@@ -97,21 +97,30 @@ const WalletManager = {
 
   selectMethod(method) {
     document.getElementById('withdraw-method').value = method;
-    const tabUpi = document.getElementById('tab-upi');
-    const tabBank = document.getElementById('tab-bank');
+    const tabs = ['tab-ton', 'tab-wld', 'tab-binance', 'tab-paypal'];
+    tabs.forEach(t => {
+      const el = document.getElementById(t);
+      if (el) el.classList.remove('active');
+    });
+
+    const activeTab = document.getElementById(`tab-${method.toLowerCase()}`);
+    if (activeTab) activeTab.classList.add('active');
+
     const labelAccount = document.getElementById('label-account');
     const inputAccount = document.getElementById('withdraw-account');
 
-    if (method === 'UPI') {
-      tabUpi.classList.add('active');
-      tabBank.classList.remove('active');
-      labelAccount.textContent = 'UPI ID (e.g. yourname@upi)';
-      inputAccount.placeholder = 'username@okaxis / 9876543210@paytm';
-    } else {
-      tabBank.classList.add('active');
-      tabUpi.classList.remove('active');
-      labelAccount.textContent = 'Bank Account Number & IFSC Code';
-      inputAccount.placeholder = 'Account: 1234567890, IFSC: SBIN0001234';
+    if (method === 'TON') {
+      labelAccount.textContent = 'TON Wallet Address';
+      inputAccount.placeholder = 'UQ... or EQ... (The Open Network address)';
+    } else if (method === 'WLD') {
+      labelAccount.textContent = 'Worldcoin (WLD) Wallet Address';
+      inputAccount.placeholder = '0x... (World Chain / Optimism address)';
+    } else if (method === 'BINANCE') {
+      labelAccount.textContent = 'Binance Pay ID / UID / Email';
+      inputAccount.placeholder = 'Binance Pay ID (e.g. 12345678) or account email';
+    } else if (method === 'PAYPAL') {
+      labelAccount.textContent = 'PayPal Email Address';
+      inputAccount.placeholder = 'your-email@example.com';
     }
   },
 

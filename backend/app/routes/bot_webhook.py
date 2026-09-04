@@ -68,13 +68,13 @@ async def telegram_webhook(request: Request, background_tasks: BackgroundTasks) 
 
         reply_text = (
             f"👋 <b>Hello, {first_name}!</b>\n\n"
-            "Welcome to <b>EarnX</b> — The premier ad-supported reward platform.\n\n"
+            "Welcome to <b>EarnX</b> — The premier reward platform.\n\n"
             "🪙 <b>How to Earn:</b>\n"
             "• 🎬 <b>Watch & Earn:</b> Watch sponsor videos for instant coins\n"
             "• 🎁 <b>Daily Streak:</b> Claim consecutive 7-day bonuses\n"
             "• 📋 <b>Tasks:</b> Complete simple sponsor missions\n"
             "• 👥 <b>Referrals:</b> Invite friends and get +50 coins\n\n"
-            "💳 <i>Redeem your coins directly to UPI or Bank Transfer!</i>"
+            "💳 <i>Redeem your coins directly to TON, WLD, Binance, or PayPal!</i>"
         )
 
         reply_markup = {
@@ -83,16 +83,6 @@ async def telegram_webhook(request: Request, background_tasks: BackgroundTasks) 
                     {
                         "text": "🚀 Open EarnX App",
                         "web_app": {"url": app_url}
-                    }
-                ],
-                [
-                    {
-                        "text": "📢 Channel",
-                        "url": "https://t.me/EarnX_App"
-                    },
-                    {
-                        "text": "💬 Support",
-                        "url": "https://t.me/SolankiPareshm"
                     }
                 ]
             ]

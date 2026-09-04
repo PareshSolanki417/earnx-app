@@ -5,9 +5,9 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class WithdrawalCreateRequest(BaseModel):
-    amount_rupees: Decimal = Field(..., gt=0, description="Amount in Indian Rupees to withdraw")
-    payout_method: str = Field(..., description="UPI or BANK_TRANSFER")
-    payout_account: str = Field(..., min_length=4, max_length=150, description="UPI ID or Bank Account + IFSC")
+    amount_rupees: Decimal = Field(..., gt=0, description="Amount to withdraw (min 0.0050)")
+    payout_method: str = Field(..., description="TON, WLD, BINANCE, or PAYPAL")
+    payout_account: str = Field(..., min_length=3, max_length=150, description="Wallet address / Pay ID / Email")
     account_holder_name: Optional[str] = Field(None, max_length=100)
 
 

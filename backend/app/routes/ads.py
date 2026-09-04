@@ -49,11 +49,8 @@ def start_ad(
         )
 
     event_id = f"evt_{user.id}_{int(uuid.uuid4().hex[:12], 16)}"
-    is_mock = not settings.is_production
-
+    is_mock = False
     mock_url = None
-    if is_mock:
-        mock_url = f"/api/monetag/postback?sub_id={user.id}&event_id={event_id}&zone_id={settings.MONETAG_ZONE_ID}"
 
     return AdStartResponse(
         event_id=event_id,

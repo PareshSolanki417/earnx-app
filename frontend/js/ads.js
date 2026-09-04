@@ -107,33 +107,52 @@ const AdsManager = {
         try {
           const adController = window.Adsgram.init({ blockId: this.ADSGRAM_REWARD_BLOCK_ID });
           const result = await adController.show();
-          if (result && (result.done || result.state === 'load')) {
+          // STRICT CHECK: User MUST have watched ad to full completion (result.done === true)
+          if (result && result.done === true) {
             btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> VERIFYING REWARD...';
-            // Verify and credit via Adsgram endpoint
             const targetId = App.user.telegram_id || App.user.id;
             const verifyRes = await API.get(`/adsgram/reward?userid=${targetId}`);
             App.showToast(`🎉 Reward Received! +${verifyRes.coins_credited || 10} Coins`, 'success');
             await WalletManager.fetchWallet();
             App.fetchUserData();
+            await this.checkStatus();
             this.startCooldown(initData.cooldown_seconds);
             this.isWatching = false;
             return;
+          } else {
+            console.warn('Adsgram ad finished without verified completion:', result);
           }
         } catch (adsgramErr) {
-          console.warn('Adsgram not available or error, falling back to Monetag:', adsgramErr);
+          console.warn('Adsgram ad failed or was blocked by Private DNS:', adsgramErr);
         }
       }
 
       // 2. SECONDARY: Fallback to Monetag Rewarded Ad (Zone 11715052)
       if (typeof window.show_11715052 === 'function') {
         btnText.innerHTML = '<i class="fa-solid fa-play"></i> PLAYING SPONSOR AD...';
-        
-        const adPromise = window.show_11715052()
-          .catch(() => window.show_11715052('pop'));
-
-        adPromise.then(async () => {
+        try {
+          // Play standard rewarded interstitial
+          await window.show_11715052();
           btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> VERIFYING REWARD...';
+          const verifyRes = await API.post('/monetag/postback', {
+            sub_id: String(App.user.id),
+            event_id: initData.event_id,
+            zone_id: "11715052",
+            payout: 0.005,
+            token: "monetag_verified"
+          });
+          App.showToast(`🎉 Reward Received! +${verifyRes.coins_credited} Coins`, 'success');
+          await WalletManager.fetchWallet();
+          App.fetchUserData();
+          await this.checkStatus();
+          this.startCooldown(initData.cooldown_seconds);
+          this.isWatching = false;
+          return;
+        } catch (monetagErr) {
+          console.warn('Monetag video rejected or failed, trying popup fallback...', monetagErr);
           try {
+            await window.show_11715052('pop');
+            btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> VERIFYING REWARD...';
             const verifyRes = await API.post('/monetag/postback', {
               sub_id: String(App.user.id),
               event_id: initData.event_id,
@@ -141,59 +160,25 @@ const AdsManager = {
               payout: 0.005,
               token: "monetag_verified"
             });
-
             App.showToast(`🎉 Reward Received! +${verifyRes.coins_credited} Coins`, 'success');
             await WalletManager.fetchWallet();
             App.fetchUserData();
+            await this.checkStatus();
             this.startCooldown(initData.cooldown_seconds);
-          } catch (postbackErr) {
-            App.showToast(postbackErr.message, 'error');
-            this.resetBtn();
-          } finally {
             this.isWatching = false;
+            return;
+          } catch (popErr) {
+            console.warn('Monetag popup also failed or closed early:', popErr);
           }
-        }).catch(err => {
-          console.warn('Monetag ad cancelled or failed:', err);
-          App.showToast('Ad was closed early or could not load.', 'error');
-          this.resetBtn();
-          this.isWatching = false;
-        });
-        return;
+        }
       }
 
-      // 3. Fallback for Local Development Simulation
-      if (initData.is_mock) {
-        btnText.innerHTML = '<i class="fa-solid fa-video fa-fade"></i> WATCHING VIDEO (3s)...';
-        setTimeout(async () => {
-          try {
-            const verifyRes = await API.post('/monetag/postback', {
-              sub_id: String(App.user.id),
-              event_id: initData.event_id,
-              zone_id: initData.zone_id || "11715052",
-              payout: 0.005,
-              token: "mock_signature_valid"
-            });
-            App.showToast(`🎉 Reward Received! +${verifyRes.coins_credited} Coins`, 'success');
-            await WalletManager.fetchWallet();
-            App.fetchUserData();
-            this.startCooldown(initData.cooldown_seconds);
-          } catch (postbackErr) {
-            App.showToast(postbackErr.message, 'error');
-            this.resetBtn();
-          } finally {
-            this.isWatching = false;
-          }
-        }, 3000);
-        return;
-      }
-
-      // Fallback
-      btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> LOADING AD...';
-      App.showToast('Connecting to sponsor ad networks, please try again.', 'info');
+      // 3. If ad was blocked by DNS or failed to play: NO COINS GIVEN!
+      App.showToast('⚠️ Ad failed to load! Please disable Private DNS or AdBlocker to earn coins.', 'error');
       this.resetBtn();
       this.isWatching = false;
     } catch (err) {
-      App.showToast(err.message, 'error');
+      App.showToast(err.message || 'Ad session could not start', 'error');
       this.resetBtn();
       this.isWatching = false;
     }
@@ -210,20 +195,23 @@ const AdsManager = {
 
   async playAdsgramTask() {
     if (!window.Adsgram || !this.ADSGRAM_TASK_BLOCK_ID) {
-      App.showToast('Task ad service not available', 'info');
+      App.showToast('Task ad service not available. Please disable AdBlocker.', 'info');
       return;
     }
     try {
       const taskController = window.Adsgram.init({ blockId: this.ADSGRAM_TASK_BLOCK_ID });
       const res = await taskController.show();
-      if (res && res.done) {
+      if (res && res.done === true) {
         const targetId = App.user.telegram_id || App.user.id;
         await API.get(`/adsgram/reward?userid=${targetId}`);
         App.showToast('🎉 Task Completed! +15 Bonus Coins credited', 'success');
         await WalletManager.fetchWallet();
+      } else {
+        App.showToast('Task was not completed. No coins awarded.', 'info');
       }
     } catch (err) {
-      console.warn('Adsgram task error:', err);
+      console.warn('Adsgram task error or blocked by DNS:', err);
+      App.showToast('Task failed to load. Please disable Private DNS / AdBlocker.', 'error');
     }
   },
 

@@ -10,10 +10,10 @@ class Withdrawal(Base):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False)
-    amount_rupees = Column(Numeric(10, 2), nullable=False)
+    amount_rupees = Column(Numeric(18, 4), nullable=False)
     coins_deducted = Column(Numeric(18, 4), nullable=False)
-    payout_method = Column(String(30), nullable=False)  # UPI, BANK_TRANSFER
-    payout_account = Column(String(255), nullable=False)  # UPI ID or Bank Account No + IFSC
+    payout_method = Column(String(30), nullable=False)  # TON, WLD, BINANCE, PAYPAL
+    payout_account = Column(String(255), nullable=False)  # Wallet address, Pay ID, or PayPal Email
     account_holder_name = Column(String(100), nullable=True)
     status = Column(String(20), default="PENDING", index=True, nullable=False)  # PENDING, PROCESSING, APPROVED, PAID, REJECTED, CANCELLED
     admin_notes = Column(Text, nullable=True)

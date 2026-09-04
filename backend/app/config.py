@@ -51,9 +51,9 @@ def sanitize_database_url(url: Optional[str]) -> str:
 
 
 class Settings(BaseSettings):
-    APP_ENV: str = "development"
+    APP_ENV: str = "production"
     APP_NAME: str = "EarnX"
-    APP_DEBUG: bool = True
+    APP_DEBUG: bool = False
     API_V1_STR: str = "/api"
     HOST: str = "0.0.0.0"
     PORT: int = 8000
@@ -80,7 +80,7 @@ class Settings(BaseSettings):
     ADMIN_PASSWORD: str = "AdminEarnX2026!"
 
     COINS_PER_RUPEE: Decimal = Decimal("100.0")
-    MIN_WITHDRAWAL_RUPEES: Decimal = Decimal("50.0")
+    MIN_WITHDRAWAL_RUPEES: Decimal = Decimal("0.0050")
     REFERRAL_BONUS_COINS: Decimal = Decimal("50.0")
     REFERRAL_QUALIFYING_ACTIONS: int = 3
     DAILY_MAX_REWARD_COINS: Decimal = Decimal("1000.0")
