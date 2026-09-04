@@ -64,7 +64,7 @@ def create_withdrawal(
 ):
     """
     Submits a withdrawal request.
-    Validates minimum amount (₹50), checks user balance, atomically debits coins from ledger,
+    Validates minimum amount (0.0050), checks user balance, atomically debits coins from ledger,
     and enqueues the request for admin verification.
     """
     client_ip = get_client_ip(request)

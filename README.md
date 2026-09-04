@@ -114,8 +114,8 @@ graph TD
    - Anti-self-referral detection.
    - Milestone rewards: Referrer receives +50 coins only after referred user completes 3 qualifying activities.
 6. **Withdrawals**:
-   - Minimum threshold enforced (default ₹50.00 / 5,000 coins).
-   - Direct support for **UPI** and **Bank Transfer**.
+   - Minimum threshold enforced (0.0050).
+   - Direct support for **TON**, **WLD (Worldcoin)**, **Binance Pay**, and **PayPal**.
    - Lifecycle: `PENDING` → `PROCESSING` → `APPROVED` → `PAID` / `REJECTED`.
    - **Automatic Refund**: If an admin rejects a withdrawal, debited coins are credited back to the user's wallet with an audited transaction record.
 7. **Comprehensive Admin Console**:
@@ -312,7 +312,7 @@ pytest tests -v
 - ✅ **10x Duplicate Postback Idempotency**: Guarantees that sending 10 identical Monetag callbacks results in **exactly 1 credit** and 9 safe idempotent returns.
 - ✅ **Telegram HMAC Validation**: Verifies authentic Telegram signatures and rejects forged or tampered queries.
 - ✅ **Double-Entry Wallet Ledger**: Verifies `balance_before` and `balance_after` calculations with Python `Decimal`.
-- ✅ **Minimum Withdrawal Rules**: Rejects payouts below ₹50.00 and validates coin deductions.
+- ✅ **Minimum Withdrawal Rules**: Rejects payouts below 0.0050 and validates coin deductions.
 - ✅ **Rejection Refund Loop**: Rejection of a withdrawal automatically returns debited coins to the user's wallet with an audited transaction record.
 - ✅ **Daily Bonus Streak**: Ensures users advance across 7 days and cannot claim multiple times on the same day.
 - ✅ **Anti-Self Referral**: Prevents users from referring their own accounts.

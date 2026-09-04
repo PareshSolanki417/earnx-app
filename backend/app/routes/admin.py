@@ -113,7 +113,7 @@ def get_dashboard_metrics(
     total_ad_events = db.query(AdEvent).filter(AdEvent.status == "VERIFIED").count()
 
     # Economics & revenue estimation:
-    # Example model: ₹0.30 gross ad revenue per verified impression
+    # Example model: $0.30 gross ad revenue per verified impression
     rev_per_ad_setting = db.query(AppSetting).filter(AppSetting.key == "ESTIMATED_REVENUE_PER_AD_RUPEES").first()
     rev_per_ad = Decimal(rev_per_ad_setting.value) if rev_per_ad_setting else Decimal("0.35")
     coins_per_rupee = wallet_service.get_coins_per_rupee(db)
@@ -404,7 +404,7 @@ def process_withdrawal_action(
             Notification(
                 user_id=w.user_id,
                 title="Withdrawal Refunded ↩️",
-                message=f"Your withdrawal of ₹{w.amount_rupees:.2f} was {target_status.lower()}. {coins_to_refund:.0f} coins were refunded back to your wallet.",
+                message=f"Your withdrawal of {w.amount_rupees:.4f} {w.payout_method} was {target_status.lower()}. {coins_to_refund:.0f} coins were refunded back to your wallet.",
                 type="WITHDRAWAL",
             )
         )
@@ -413,7 +413,7 @@ def process_withdrawal_action(
             Notification(
                 user_id=w.user_id,
                 title="Withdrawal Paid Successfully! 💰",
-                message=f"Your payout of ₹{w.amount_rupees:.2f} via {w.payout_method} has been sent.",
+                message=f"Your payout of {w.amount_rupees:.4f} {w.payout_method} via {w.payout_method} has been sent.",
                 type="WITHDRAWAL",
             )
         )

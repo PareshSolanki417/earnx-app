@@ -92,14 +92,14 @@ const AdminApp = {
       document.getElementById('kpi-today-users').textContent = `+${m.todays_users} new today`;
       document.getElementById('kpi-total-coins').textContent = parseFloat(m.total_coins_issued).toLocaleString();
       document.getElementById('kpi-pending-withdrawals').textContent = m.pending_withdrawals_count;
-      document.getElementById('kpi-pending-amount').textContent = `₹${parseFloat(m.pending_withdrawals_amount).toFixed(2)}`;
+      document.getElementById('kpi-pending-amount').textContent = `$${parseFloat(m.pending_withdrawals_amount).toFixed(2)}`;
       document.getElementById('kpi-paid-withdrawals').textContent = m.paid_withdrawals_count;
-      document.getElementById('kpi-paid-amount').textContent = `₹${parseFloat(m.paid_withdrawals_amount).toFixed(2)}`;
+      document.getElementById('kpi-paid-amount').textContent = `$${parseFloat(m.paid_withdrawals_amount).toFixed(2)}`;
 
       document.getElementById('kpi-ad-impressions').textContent = m.todays_ad_events;
-      document.getElementById('kpi-gross-revenue').textContent = `₹${parseFloat(m.estimated_gross_revenue).toFixed(2)}`;
-      document.getElementById('kpi-user-rewards').textContent = `₹${parseFloat(m.estimated_user_rewards).toFixed(2)}`;
-      document.getElementById('kpi-margin').textContent = `₹${parseFloat(m.estimated_platform_margin).toFixed(2)}`;
+      document.getElementById('kpi-gross-revenue').textContent = `$${parseFloat(m.estimated_gross_revenue).toFixed(2)}`;
+      document.getElementById('kpi-user-rewards').textContent = `$${parseFloat(m.estimated_user_rewards).toFixed(2)}`;
+      document.getElementById('kpi-margin').textContent = `$${parseFloat(m.estimated_platform_margin).toFixed(2)}`;
 
       const envBadge = document.getElementById('env-badge');
       if (envBadge) {
@@ -207,7 +207,7 @@ const AdminApp = {
         <tr>
           <td><code>${w.id.substring(0, 8)}</code></td>
           <td>#${w.user_id}</td>
-          <td><strong>₹${parseFloat(w.amount_rupees).toFixed(2)}</strong></td>
+          <td><strong>${parseFloat(w.amount_rupees).toFixed(4)} ${w.payout_method}</strong></td>
           <td>${parseFloat(w.coins_deducted).toLocaleString()}</td>
           <td>${w.payout_method}</td>
           <td>${w.payout_account}</td>
@@ -346,13 +346,13 @@ const AdminApp = {
                   <button class="btn btn-primary btn-small" onclick="AdminApp.saveSetting('AD_REWARD_COINS')">Save</button>
                 </div>
                 <small id="ad-reward-calc" style="color: var(--emerald); font-size: 12px; display: block; margin-top: 4px;">
-                  = ₹${((parseFloat(map['AD_REWARD_COINS'] || 10) / cpr)).toFixed(2)} per ad view
+                  = $${((parseFloat(map['AD_REWARD_COINS'] || 10) / cpr)).toFixed(4)} per ad view
                 </small>
               </div>
 
               <div class="setting-field">
                 <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">
-                  Estimated Ad Revenue (₹ per view):
+                  Estimated Ad Revenue ($ per view):
                 </label>
                 <div style="display: flex; gap: 8px;">
                   <input type="number" step="0.01" id="setting-ESTIMATED_REVENUE_PER_AD_RUPEES" value="${map['ESTIMATED_REVENUE_PER_AD_RUPEES'] || '0.35'}" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: #fff;" />
@@ -382,13 +382,13 @@ const AdminApp = {
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
               <div class="setting-field">
                 <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">
-                  Coins per ₹1.00 (Conversion Rate):
+                  Coins per $1.00 (Conversion Rate):
                 </label>
                 <div style="display: flex; gap: 8px;">
                   <input type="number" id="setting-COINS_PER_RUPEE" value="${map['COINS_PER_RUPEE'] || '100.0'}" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: #fff;" oninput="AdminApp.calcAdRupees()" />
                   <button class="btn btn-primary btn-small" onclick="AdminApp.saveSetting('COINS_PER_RUPEE')">Save</button>
                 </div>
-                <small style="color: var(--text-sub); font-size: 12px; display: block; margin-top: 4px;">Default: 100 coins = ₹1.00</small>
+                <small style="color: var(--text-sub); font-size: 12px; display: block; margin-top: 4px;">Default: 100 coins = $1.00</small>
               </div>
 
               <div class="setting-field">
@@ -460,7 +460,7 @@ const AdminApp = {
     const cpr = parseFloat(document.getElementById('setting-COINS_PER_RUPEE')?.value || 100);
     const el = document.getElementById('ad-reward-calc');
     if (el && cpr > 0) {
-      el.innerText = `= ₹${(coins / cpr).toFixed(2)} per ad view`;
+      el.innerText = `= $${(coins / cpr).toFixed(4)} per ad view`;
     }
   },
 

@@ -64,7 +64,8 @@ async def telegram_webhook(request: Request, background_tasks: BackgroundTasks) 
         ref_code = parts[1].strip().upper() if len(parts) > 1 else None
 
         base_url = settings.WEBAPP_URL.rstrip("/")
-        app_url = f"{base_url}/?startapp={ref_code}" if ref_code else f"{base_url}/"
+        version_param = "v=20260904_03"
+        app_url = f"{base_url}/?{version_param}&startapp={ref_code}" if ref_code else f"{base_url}/?{version_param}"
 
         reply_text = (
             f"👋 <b>Hello, {first_name}!</b>\n\n"
@@ -95,7 +96,7 @@ async def telegram_webhook(request: Request, background_tasks: BackgroundTasks) 
             "ℹ️ <b>EarnX Help & Commands</b>\n\n"
             "1. Tap <b>Open EarnX App</b> to launch the Mini App.\n"
             "2. All coin balances are stored in an immutable double-entry ledger.\n"
-            "3. Payouts require a minimum of ₹50.00 (5,000 coins).\n"
+            "3. Payouts require a minimum of 0.0050 (TON, WLD, Binance, PayPal).\n"
             "4. Need help? Contact @SolankiPareshm"
         )
         background_tasks.add_task(send_telegram_reply, chat_id, help_text)

@@ -140,12 +140,13 @@ const AdsManager = {
       const initData = await API.post('/ads/start', { ad_type: 'rewarded' });
       
       const currentCoins = parseFloat(WalletManager.walletData?.available_coins || 0);
-      const adViewerUrl = `${window.location.origin}/view-ad.html?uid=${App.user.id}&event_id=${initData.event_id}&zone_id=11715052`;
+      const baseHost = window.location.origin || 'https://earnx-app.onrender.com';
+      const adViewerUrl = `${baseHost}/view-ad.html?v=20260904_03&uid=${App.user.id}&event_id=${initData.event_id}&zone_id=11715052`;
 
       // Open ad in Google Chrome or default external browser
       if (window.Telegram?.WebApp?.openLink) {
         App.showToast('🌐 Opening ad in Chrome browser...', 'info');
-        window.Telegram.WebApp.openLink(adViewerUrl);
+        window.Telegram.WebApp.openLink(adViewerUrl, { try_instant_view: false });
       } else {
         window.open(adViewerUrl, '_blank');
       }

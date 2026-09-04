@@ -122,14 +122,32 @@ admin_dir = os.path.join(base_dir, "admin")
 if os.path.exists(admin_dir):
     app.mount("/admin-portal", StaticFiles(directory=admin_dir, html=True), name="admin")
 
+NO_CACHE_HEADERS = {
+    "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
+    "Pragma": "no-cache",
+    "Expires": "0",
+}
+
 if os.path.exists(frontend_dir):
     # Mount frontend static assets
     app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
 
+    js_dir = os.path.join(frontend_dir, "js")
+    if os.path.exists(js_dir):
+        app.mount("/js", StaticFiles(directory=js_dir), name="frontend_js")
+
+    css_dir = os.path.join(frontend_dir, "css")
+    if os.path.exists(css_dir):
+        app.mount("/css", StaticFiles(directory=css_dir), name="frontend_css")
+
     @app.get("/")
     async def serve_index():
-        return FileResponse(os.path.join(frontend_dir, "index.html"))
+        return FileResponse(os.path.join(frontend_dir, "index.html"), headers=NO_CACHE_HEADERS)
+
+    @app.get("/view-ad.html")
+    async def serve_view_ad():
+        return FileResponse(os.path.join(frontend_dir, "view-ad.html"), headers=NO_CACHE_HEADERS)
 
     @app.get("/admin")
     async def serve_admin_index():
-        return FileResponse(os.path.join(admin_dir, "index.html"))
+        return FileResponse(os.path.join(admin_dir, "index.html"), headers=NO_CACHE_HEADERS)

@@ -30,9 +30,9 @@ def seed_database(db: Session):
 
     # 2. Seed Baseline AppSettings
     default_settings = [
-        ("COINS_PER_RUPEE", str(settings.COINS_PER_RUPEE), "Number of coins equal to ₹1.00"),
+        ("COINS_PER_RUPEE", str(settings.COINS_PER_RUPEE), "Number of coins equal to $1.00"),
         ("MIN_WITHDRAWAL_RUPEES", "0.0050", "Minimum withdrawal threshold"),
-        ("AD_REWARD_COINS", "10.0", "Coins awarded per verified rewarded ad impression (10 coins = ₹0.10)"),
+        ("AD_REWARD_COINS", "10.0", "Coins awarded per verified rewarded ad impression"),
         ("REFERRAL_BONUS_COINS", str(settings.REFERRAL_BONUS_COINS), "Coins awarded when a referral completes qualifying actions"),
         ("REFERRAL_QUALIFYING_ACTIONS", str(settings.REFERRAL_QUALIFYING_ACTIONS), "Number of verified ad views required for referral bonus"),
         ("DAILY_BONUS_DAY_1", "10.0", "Coins for Day 1 check-in"),

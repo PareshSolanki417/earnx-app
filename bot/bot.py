@@ -25,7 +25,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     # Construct WebApp URL with start parameter for referral routing
     base_url = settings.WEBAPP_URL.rstrip("/")
-    app_url = f"{base_url}/?startapp={referral_code}" if referral_code else base_url
+    version_param = "v=20260904_03"
+    app_url = f"{base_url}/?{version_param}&startapp={referral_code}" if referral_code else f"{base_url}/?{version_param}"
 
     welcome_text = (
         f"👋 Hello, *{user.first_name}*!\n\n"
@@ -59,7 +60,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "ℹ️ *EarnX Help Guide*\n\n"
         "1. Tap *Open EarnX Mini App* to view your balance.\n"
         "2. All coin balances are stored in an immutable double-entry ledger.\n"
-        "3. Payouts require minimum ₹50 (5,000 coins).\n"
+        "3. Payouts require minimum 0.0050 (TON, WLD, Binance, PayPal).\n"
         "4. Automated bots and click spam are strictly prohibited."
     )
     await update.message.reply_markdown(help_text)
